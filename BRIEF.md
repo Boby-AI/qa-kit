@@ -1,6 +1,11 @@
 # qa-kit — brief
 
-Owner's plan, agreed in conversation on 2026-10-20. Built so far: the plugin (tester, adversary, `/kontrol`). Git hook and PR gate come after the trial.
+Owner's plan, agreed in conversation on 2026-10-20.
+
+Status (2026-10-20): live in `directorai` (Boby-AI/directorai#362) and `shinyai` (Boby-AI/shinyai#29): pre-push fast
+checks, `/qa-kit:kontrol` on every ready PR, full scan from Actions. A `qa-kit` ruleset on each `main` requires the
+`kontrol` check (directorai's existing rules already require its tests; production is left out on purpose). Team guide:
+[`KILAVUZ.md`](KILAVUZ.md). Not yet: PlayMate.
 
 ## Goal
 
