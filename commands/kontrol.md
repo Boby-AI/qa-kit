@@ -65,4 +65,4 @@ When everything passes, the last step is the owner's: they try it and say "oldu"
 
 ## In CI
 
-When the `CI` environment variable is set, nobody is there to approve. Skip step 3 (CI runs the fast checks in its own job). A big change without an approved spec fails with "spec needed". Never fix code. End by writing `.qa/verdict` containing `pass` or `fail` (fail on any failing criterion or blocker finding), and put the report in `.qa/report.md`.
+When the `CI` environment variable is set, nobody is there to approve. Skip step 3 (CI runs the fast checks in its own job). Nothing changed or a small change passes. A big change without an approved spec fails with "spec needed". Never fix code. End by writing `.qa/verdict` containing `pass` or `fail` (fail on any failing criterion or blocker finding), and put the report in `.qa/report.md`.
