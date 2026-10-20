@@ -4,6 +4,7 @@ name: qa-kit
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
     inputs:
       parts:
@@ -35,8 +36,9 @@ jobs:
 
   kontrol:
     name: ${{ github.event_name == 'pull_request' && 'kontrol' || 'tam-tarama' }}
-    # Fork and Dependabot PRs get no secrets, so they are skipped rather than always red.
-    if: github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]')
+    # Drafts are unfinished work, so they wait for "Ready for review". Fork and Dependabot PRs get
+    # no secrets, so they are skipped rather than always red.
+    if: github.event_name != 'pull_request' || (!github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]')
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
