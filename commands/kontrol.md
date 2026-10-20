@@ -67,4 +67,16 @@ When everything passes, the last step is the owner's: they try it and say "oldu"
 
 ## In CI
 
-When the `CI` environment variable is set, nobody is there to approve. Skip step 3 (CI runs the fast checks in its own job). No changed files passes. A small change passes unless the reviewer finds a blocker. A big change without an approved spec does not wait: draft it from the PR title and description (`gh pr view --json title,body`, never the code), save it to `.qa/spec.md`, and run the tester and adversary against it. Start the report with the criteria you tested, marked "from the PR description, not approved", so a reader can see at a glance whether the right thing was tested. Never fix code. End by writing `.qa/verdict` containing `pass` or `fail` (fail on any failing criterion or any blocker from the reviewer or adversary), and put the report in `.qa/report.md`. Also write `.qa/comments.json`: an array with one `{"path", "line", "body"}` per reviewer finding whose line is in the diff (new side), where `body` is the severity and a one-line title in bold, what goes wrong, then the fix prompt inside `<details><summary>Prompt to fix with AI</summary>` … `</details>`. `qa-kit report` posts these as inline comments.
+When the `CI` environment variable is set, nobody is there to approve. Skip step 3 (CI runs the fast checks in its own job). No changed files passes. A small change passes unless the reviewer finds a blocker. A big change without an approved spec does not wait: draft it from the PR title and description (`gh pr view --json title,body`, never the code), save it to `.qa/spec.md`, and run the tester and adversary against it. Start the report with the criteria you tested, marked "from the PR description, not approved", so a reader can see at a glance whether the right thing was tested. Never fix code. End by writing `.qa/verdict` containing `pass` or `fail` (fail on any failing criterion or any blocker from the reviewer or adversary), and put the report in `.qa/report.md`, written in the language of the PR description, short enough to read in ten seconds:
+
+```
+✅ Passed — <one plain sentence: what was checked>
+```
+or
+```
+❌ Needs a fix — <one plain sentence>
+
+1. <the problem in plain words, one line> (`file:line`)
+```
+
+List only blockers and majors, one line each. Everything else (criteria tested, minors, what held up, fix prompts) goes inside one `<details><summary>Details</summary>` block below. Also write `.qa/comments.json`: an array with one `{"path", "line", "body"}` per blocker or major reviewer finding whose line is in the diff (new side); minors stay in the details, where `body` is the severity and a one-line title in bold, what goes wrong, then the fix prompt inside `<details><summary>Prompt to fix with AI</summary>` … `</details>`. `qa-kit report` posts these as inline comments.
