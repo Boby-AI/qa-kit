@@ -40,7 +40,7 @@ Okuyucunun notları **Files changed** sekmesinde ilgili satırın altındadır; 
 Kurallar:
 
 - Hatayı düzeltmek için **kodu** düzeltin. Tadımcının testlerini (`qa-spec` adlı dosyalar) değiştirmeyin; test yanlış diyorsanız PR'da yazın.
-- Notların hepsi zorunlu değil. Sadece gerçek hatalar (blocker) PR'ı durdurur, gerisi öneridir.
+- Her notun başında rengi var: 🔴 **blocker** (gerçek hata, PR'ı durdurur), 🟠 **major** (büyük ihtimalle hata, düzeltin), 🟡 **minor** (öneri, acil değil). Sadece 🔴 PR'ı durdurur.
 
 ## Tüm projeyi taramak
 

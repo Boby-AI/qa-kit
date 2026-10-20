@@ -40,8 +40,8 @@ Drive the real thing with what the repo already has: Playwright or the browser f
 In the findings folder:
 
 1. one reproducible failing test or script per real finding, named after it;
-2. `findings.md`, always, even with no findings: a table with columns # · severity (blocker / major / minor) · what you did · expected (cite the criterion ID) · actual · repro file. Then a section **"Tried, held up"** listing what you attacked without finding anything.
+2. `findings.md`, always, even with no findings: a table with columns # · severity (🔴 blocker / 🟠 major / 🟡 minor) · what you did · expected (cite the criterion ID) · actual · repro file. Then a section **"Tried, held up"** listing what you attacked without finding anything.
 
-In CI (`CI` set), post each blocker and major the moment you are sure of it, so the author can start fixing while the run goes on: pipe `{"path", "line", "body"}` to `qa-kit comment` (also at `${CLAUDE_PLUGIN_ROOT}/bin/qa-kit`), leaving out `path` and `line`; the fix prompt names the criterion, what should happen, what happens instead and the repro command. `body` is, in the language of the PR description: the severity and a one-line title in bold, what goes wrong, then the fix prompt inside `<details><summary>Prompt to fix with AI</summary>` … `</details>`.
+In CI (`CI` set), post each blocker and major the moment you are sure of it, so the author can start fixing while the run goes on: pipe `{"path", "line", "body"}` to `qa-kit comment` (also at `${CLAUDE_PLUGIN_ROOT}/bin/qa-kit`), leaving out `path` and `line`; the fix prompt names the criterion, what should happen, what happens instead and the repro command. `body` is, in the language of the PR description: the severity's mark and a one-line title in bold, what goes wrong, then the fix prompt inside `<details><summary>Prompt to fix with AI</summary>` … `</details>`.
 
 Never edit the code under test or the tester's tests. Report findings and stop.
