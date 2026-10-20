@@ -37,9 +37,9 @@ Small changes (a colour, a text) skip this. Anything that touches money, rewards
 - `/kontrol` checks **only what changed** (git diff). In a monorepo it picks the changed parts; a change to
   shared code checks every part that uses it.
 - **Before push** (git hook, e.g. Husky for React): fast checks only (format, lint, tests), so nobody is tempted to skip.
-- **On PR** (GitHub Actions): the slow ones (adversary, screenshot comparison). This is the gate that can't be bypassed.
-- **Full scan** of a whole project: **started on demand** (`/tam-tarama` or a GitHub button), not on a fixed
-  nightly schedule. Runs in the background and reports when done.
+- **Before the PR** (author's computer): the full `/kontrol` with tester and adversary; Claude can't open the PR until it passes.
+- **On PR** (GitHub Actions): only the reviewer, like a review bot. No project setup on GitHub.
+- **Full scan** of a whole project: **started on demand** with `/tam-tarama`, locally. Runs in the background and reports when done.
 
 ## Projects that will use it
 
@@ -58,8 +58,8 @@ The other developers work in React.
 - Work lands through PRs, not straight pushes to main (approved 2026-10-20).
 - Existing hooks (e.g. lefthook in `directorai`) are reused, not replaced by Husky.
 - A reviewer agent reads every change (Greptile-style inline comments with fix prompts); tester and adversary run on big changes.
-- CI never blocks on a missing spec: PR descriptions are written by Claude anyway, so CI drafts the criteria from the PR
-  description and tests against them, listing them at the top of the report. Owner approval stays optional locally (`/kontrol`).
+- Tests and attacks run only locally, before the PR; GitHub only reviews the code (2026-10-20). Installing a project's
+  toolchain, ffmpeg and the like on GitHub made every PR slow and fragile.
 - Draft PRs wait for "Ready for review". Money is not the constraint; signal over noise is.
 
 ## Working with the owner

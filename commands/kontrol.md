@@ -36,7 +36,7 @@ If it is missing or its front matter lacks `status: approved`:
    - numbered acceptance criteria `K1`, `K2`, … — each one observable and testable;
    - an **Interface** section: the functions, endpoints, screens or element ids the tests may use.
 2. Show it to the owner in plain words and wait for approval. Apply their edits.
-3. Save it with front matter `status: approved` and commit it on its own, so the PR's CI run finds it.
+3. Save it with front matter `status: approved` and commit it on its own.
 
 Never change an approved spec without the owner.
 
@@ -44,7 +44,7 @@ Never change an approved spec without the owner.
 
 Launch the `qa-kit:reviewer` agent on every change, with the base ref (`git merge-base origin/<base> HEAD`) and the spec path if there is one.
 
-For a big change, launch the `qa-kit:tester` and `qa-kit:adversary` agents too, all three **in parallel**: in one message, each with `run_in_background: false`, and wait for every result before the report (in CI a background agent dies when you end your turn). Give the tester and adversary only:
+For a big change, launch the `qa-kit:tester` and `qa-kit:adversary` agents too, all three **in parallel**: in one message, each with `run_in_background: false`, and wait for every result before the report. Give the tester and adversary only:
 
 - the spec path;
 - the affected parts' entries from `qa-kit.json`;
@@ -63,14 +63,14 @@ Tell the owner, simply:
 
 Real bugs → fix the **code**, then run `/kontrol` again. Never edit the tester's `qa-spec` tests or the adversary's repros to make them pass; if you think one is wrong, say why and let the owner decide.
 
-When everything passes, the last step is the owner's: they try it and say "oldu".
+When the fast checks, every criterion and the reviewer pass with no blocker, and no part names limited the run, run `qa-kit pass`. Opening the PR stays blocked until it has run on the code as it is; on push it marks the commit `qa-kit/local` on GitHub. Then the last step is the owner's: they try it and say "oldu".
 
 ## In CI
 
-When the `CI` environment variable is set, nobody is there to approve. Skip step 3 (CI runs the fast checks in its own job). No changed files passes. Whatever happens, never end your turn before `.qa/verdict` and `.qa/report.md` are written. A small change passes unless the reviewer finds a blocker. A big change without an approved spec does not wait: draft it from the PR title and description (`gh pr view --json title,body`, never the code), save it to `.qa/spec.md`, and run the tester and adversary against it. Start the report with the criteria you tested, marked "from the PR description, not approved", so a reader can see at a glance whether the right thing was tested. Never fix code. End by writing `.qa/verdict` containing `pass` or `fail` (fail on any failing criterion or any blocker from the reviewer or adversary), and put the report in `.qa/report.md`, written in the language of the PR description, short enough to read in ten seconds:
+When the `CI` environment variable is set, GitHub runs only the reviewer, the way a review bot would: no fast checks, no spec, no tester or adversary, which run on the author's computer before the PR. Skip steps 3–5 and launch only the `qa-kit:reviewer` agent with the base ref. No changed files passes. It posts its own blockers and majors as PR comments; don't post them again. Never fix code, and never end your turn before writing `.qa/verdict` (`fail` on any blocker, else `pass`) and `.qa/report.md`, in the language of the PR description, short enough to read in ten seconds:
 
 ```
-✅ Passed — <one plain sentence: what was checked>
+✅ Passed — <one plain sentence: what was reviewed>
 ```
 or
 ```
@@ -80,4 +80,4 @@ or
 2. 🟠 <…>
 ```
 
-List only blockers and majors, one line each, blockers first. Everything else (criteria tested, minors, what held up, fix prompts) goes inside one `<details><summary>Details</summary>` block below. The reviewer and adversary already posted their blockers and majors as PR comments while they ran; don't post them again.
+List only blockers and majors, one line each, blockers first. Minors and what held up go inside one `<details><summary>Details</summary>` block below.

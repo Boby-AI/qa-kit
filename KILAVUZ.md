@@ -4,9 +4,9 @@ PR'larınızı main'e girmeden önce kontrol eden otomatik bir ekip. Kuralı bas
 
 | Kim | Ne yapar | Ne zaman |
 |---|---|---|
-| **Okuyucu** | Kodu okur, gerçek hataları satırın altına not düşer (Greptile gibi). | Her PR |
-| **Tadımcı** | Kodu hiç görmeden, "ne isteniyordu" listesine göre test yazar ve çalıştırır. | Büyük ve riskli işler |
-| **Sabotajcı** | İşi bozmaya çalışır: iki kez basma, internet kesilmesi, geri tuşu, küçük ekran… | Büyük ve riskli işler |
+| **Okuyucu** | Kodu okur, gerçek hataları satırın altına not düşer (Greptile gibi). | Her değişiklik; GitHub'da sadece o çalışır |
+| **Tadımcı** | Kodu hiç görmeden, "ne isteniyordu" listesine göre test yazar ve çalıştırır. | Büyük ve riskli işler, PR'dan önce bilgisayarınızda |
+| **Sabotajcı** | İşi bozmaya çalışır: iki kez basma, internet kesilmesi, geri tuşu, küçük ekran… | Büyük ve riskli işler, PR'dan önce bilgisayarınızda |
 
 "Büyük" iş: yeni özellik, mantık değişikliği ya da para, ödeme, hesap gibi hassas dosyalara dokunan her şey. Yazı, renk ve boşluk değişiklikleri küçüktür.
 
@@ -22,8 +22,8 @@ Projenin klasöründe `pnpm install` yaptıysanız göndermeden önceki kontrol 
 ## Günlük kullanım
 
 1. **Kod gönderirken (`git push`)** değişen parçaların hızlı testleri kendiliğinden çalışır. Hata varsa gönderim durur, ekranda nedeni yazar.
-2. **PR açınca** bir şey yapmanıza gerek yok. Taslak (draft) PR'da çalışmaz; **Ready for review** deyince çalışır. Mevcut testlerle aynı anda yürür.
-3. **İsterseniz önce kendiniz:** Claude'da `/qa-kit:kontrol` yazın. Büyük işte size "ne isteniyordu" listesini gösterir; onaylarsanız PR o listeyle test edilir. Yazmazsanız GitHub listeyi PR açıklamasından kendisi çıkarır.
+2. **PR açmadan önce** Claude'da `/qa-kit:kontrol` yazın. Büyük işte size "ne isteniyordu" listesini gösterir, onaylarsınız; Tadımcı ve Sabotajcı bilgisayarınızda çalışır. Geçmeden Claude PR açmaz. Geçince commit'iniz GitHub'da **qa-kit/local** işaretini alır.
+3. **PR açınca** GitHub'da sadece Okuyucu çalışır, birkaç dakikada biter. Taslak (draft) PR'da çalışmaz; **Ready for review** deyince çalışır.
 
 ## Raporu okumak
 
@@ -33,9 +33,9 @@ Rapor PR'ın **en son yorumudur**:
 - `❌ Needs a fix`: altında düzeltilmesi gerekenler, her biri bir satır.
 - **Details**: tıklayınca açılır. İçinde test edilen maddeler, küçük öneriler ve **her hata için Claude'a yapıştırılacak hazır düzeltme komutu** vardır.
 
-**Beklemeden başlayın:** Okuyucu ve Sabotajcı ciddi bir hata bulunca raporu beklemez, hemen PR'a not düşer. Rapor gelmeden ilk notları görürseniz düzeltmeye başlayabilirsiniz.
+**Beklemeden başlayın:** Okuyucu ciddi bir hata bulunca raporu beklemez, hemen not düşer.
 
-Okuyucunun notları **Files changed** sekmesinde ilgili satırın altındadır; Sabotajcınınkiler PR'ın yorumlarındadır. Her notta **Prompt to fix with AI** açılır kutusu vardır: kopyalayın, Claude'a yapıştırın.
+Okuyucunun notları **Files changed** sekmesinde ilgili satırın altındadır. Her notta **Prompt to fix with AI** açılır kutusu vardır: kopyalayın, Claude'a yapıştırın.
 
 Kurallar:
 
@@ -46,8 +46,7 @@ Kurallar:
 
 Normal kontrol sadece değişen yere bakar. Tüm projeyi taramak için:
 
-- **GitHub'dan:** repoda **Actions** → soldan **qa-kit** → **Run workflow**. Bir parça adı yazabilir (ör. `native`) ya da boş bırakıp her yeri taratabilirsiniz. 20-40 dakika sürer; rapor o çalıştırmanın **Summary** sayfasındadır.
-- **Bilgisayarınızdan:** Claude'da `/qa-kit:tam-tarama`. Sadece bazı parçalar için adlarını yazın: `/qa-kit:tam-tarama native` ya da `/qa-kit:tam-tarama billing api`.
+Claude'da `/qa-kit:tam-tarama` yazın. Sadece bazı parçalar için adlarını yazın: `/qa-kit:tam-tarama native` ya da `/qa-kit:tam-tarama billing api`.
 
 Parça adları projenin kökündeki `qa-kit.json` dosyasında, `parts` altında yazar.
 
@@ -55,6 +54,6 @@ Büyük bir sürümden önce ya da arada bir "her şey yolunda mı" diye kullan�
 
 ## Sorun olursa
 
-- **"spec" ya da liste ile ilgili bir şey soruyor:** `/qa-kit:kontrol` yazıp gösterdiği listeyi onaylayın.
+- **Claude PR açmıyor, "/qa-kit:kontrol" diyor:** kontrol bu kodda henüz geçmedi ya da sonra kod değişti. Her şeyi commit'leyip `/qa-kit:kontrol` yazın.
 - **Göndermeden önceki kontrol bilgisayarınızda eksik bir araç yüzünden duruyor:** hata mesajında yazan aracı kurun. Acil durumda `git push --no-verify` ile geçebilirsiniz; PR'daki kontrol yine çalışır.
 - **Bir projeye eklemek:** projenin köküne `qa-kit.json` ekleyin ([README](README.md#project-config-qa-kitjson)).

@@ -1,6 +1,7 @@
-# Copy to .github/workflows/qa-kit.yml and replace the SETUP step with the project's own.
-# Needs the ANTHROPIC_API_KEY secret and `.qa/` plus `.qa-kit/` in .gitignore. Make "kontrol" a required
-# check on main.
+# Copy to .github/workflows/qa-kit.yml. Needs the ANTHROPIC_API_KEY secret and `.qa/` plus `.qa-kit/`
+# in .gitignore. Make "kontrol" a required check on main.
+# GitHub only reviews the code, so no project setup is needed: the tests and attacks run on the
+# author's computer with /qa-kit:kontrol before the PR (the commit then shows "qa-kit/local").
 name: qa-kit
 
 on:
@@ -9,11 +10,6 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
-  workflow_dispatch:
-    inputs:
-      parts:
-        description: Parts to scan (empty = all)
-        required: false
 
 permissions:
   contents: read
@@ -21,7 +17,7 @@ permissions:
 
 # The plugin, the report tool and the pre-push hook run one qa-kit release: bump it here and there together.
 env:
-  QA_KIT_REF: v0.5.8
+  QA_KIT_REF: v0.6.0
 
 # A new push cancels the run for the old one, so an older report never overwrites a newer one.
 concurrency:
@@ -29,9 +25,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  fast:
-    name: fast
-    if: github.event_name == 'pull_request'
+  kontrol:
+    name: kontrol
+    # Drafts are unfinished work, so they wait for "Ready for review". Fork and Dependabot PRs get
+    # no secrets, so they are skipped rather than always red.
+    if: ${{ !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -39,22 +37,6 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      # SETUP: install the toolchain and dependencies, e.g. `uses: ./.github/actions/setup`
-      - run: npx --yes "github:Boby-AI/qa-kit#${QA_KIT_REF}" fast
-
-  kontrol:
-    name: ${{ github.event_name == 'pull_request' && 'kontrol' || 'tam-tarama' }}
-    # Drafts are unfinished work, so they wait for "Ready for review". Fork and Dependabot PRs get
-    # no secrets, so they are skipped rather than always red.
-    if: github.event_name != 'pull_request' || (!github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]')
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      # SETUP: same as above
       # The plugin from the pinned release rather than qa-kit's default branch: it runs with this
       # workflow's secrets. The action takes a marketplace URL only without a ref, so the release is
       # checked out and installed from its path.
@@ -65,7 +47,7 @@ jobs:
           path: .qa-kit
           persist-credentials: false
       - uses: anthropics/claude-code-action@v1
-        # The reviewer and adversary post findings with `qa-kit comment` as they find them.
+        # The reviewer posts findings with `qa-kit comment` as it finds them.
         env:
           GH_TOKEN: ${{ github.token }}
         with:
@@ -73,7 +55,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           plugin_marketplaces: ${{ github.workspace }}/.qa-kit
           plugins: qa-kit@boby
-          prompt: ${{ github.event_name == 'pull_request' && '/qa-kit:kontrol' || format('/qa-kit:tam-tarama {0}', inputs.parts) }}
+          prompt: /qa-kit:kontrol
           claude_args: --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Agent"
       - name: Report
         if: ${{ !cancelled() }}

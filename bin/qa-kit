@@ -3,14 +3,22 @@
 // qa-kit fast  [--all]  → runs those parts' fast commands; exits 1 if any fails
 // qa-kit report         → CI: posts the /kontrol report to the PR
 // qa-kit comment        → CI: posts one finding to the PR right away (JSON on stdin)
+// qa-kit pass           → local: records that /kontrol passed on the code as it is now
+// qa-kit gate | mark    → Claude Code hooks: no PR before /kontrol passes; mark the pushed commit as passed
 import { execSync, spawnSync } from "node:child_process";
-import { appendFileSync, existsSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, matchesGlob } from "node:path";
 
 const [command, ...flags] = process.argv.slice(2);
 const all = flags.includes("--all");
-const git = (args) => execSync(`git ${args}`, { encoding: "utf8" }).trim();
-const root = git("rev-parse --show-toplevel");
+const git = (args, env) => execSync(`git ${args}`, { encoding: "utf8", env, stdio: ["pipe", "pipe", "ignore"] }).trim();
+// The hooks run in every project the plugin is installed in; outside a qa-kit project they do nothing.
+const root = (() => {
+	try {
+		return git("rev-parse --show-toplevel");
+	} catch {}
+})();
+if (["gate", "mark"].includes(command) && !existsSync(join(root ?? "", "qa-kit.json"))) process.exit(0);
 process.chdir(root);
 const config = JSON.parse(readFileSync(join(root, "qa-kit.json"), "utf8"));
 const parts = Object.entries(config.parts);
@@ -93,9 +101,39 @@ function comment() {
 	gh(["pr", "comment", String(number), "--body-file", "-"], path ? `\`${path}:${line}\`\n\n${body}` : body);
 }
 
+// What /kontrol checked: every file outside the qa output, so any later edit needs a new run.
+function fingerprint() {
+	const outputs = `.qa ${config.findings}`;
+	const env = { ...process.env, GIT_INDEX_FILE: join(git("rev-parse --absolute-git-dir"), "qa-kit-index") };
+	git(`read-tree HEAD && git add -A && git rm -r -q --cached --ignore-unmatch ${outputs}`, env);
+	const changes = git("status --porcelain").split("\n").filter((line) => line && !/^.. "?\.qa\//.test(line) && !line.slice(3).startsWith(config.findings));
+	return { tree: git("write-tree", env), clean: !changes.length };
+}
+const passFile = () => join(git("rev-parse --absolute-git-dir"), "qa-kit-pass");
+const passed = () => existsSync(passFile()) && readFileSync(passFile(), "utf8") === fingerprint().tree;
+const hookCommand = () => JSON.parse(readFileSync(0, "utf8")).tool_input?.command ?? "";
+
 if (command === "report") report();
 if (command === "comment") {
 	comment();
+	process.exit(0);
+}
+if (command === "pass") {
+	writeFileSync(passFile(), fingerprint().tree);
+	process.exit(0);
+}
+if (command === "gate") {
+	if (!/\bgh\s+pr\s+create\b/.test(hookCommand())) process.exit(0);
+	const { clean } = fingerprint();
+	if (passed() && clean) process.exit(0);
+	console.error(clean ? "Run /qa-kit:kontrol before opening the PR: it has not passed on this code yet." : "Commit everything first, then run /qa-kit:kontrol if the code changed since it last passed.");
+	process.exit(2);
+}
+if (command === "mark") {
+	if (!/\b(git\s+push|gh\s+pr\s+create)\b/.test(hookCommand()) || !passed() || !fingerprint().clean) process.exit(0);
+	// Fails quietly when the commit is not on GitHub yet; the next push marks it.
+	const status = ["api", `repos/{owner}/{repo}/statuses/${git("rev-parse HEAD")}`, "-f", "state=success", "-f", "context=qa-kit/local", "-f", "description=/qa-kit:kontrol passed locally"];
+	spawnSync("gh", status, { stdio: "ignore" });
 	process.exit(0);
 }
 
@@ -116,6 +154,6 @@ if (command === "parts") {
 	for (const f of failed) console.log(`  ✗ ${f}`);
 	process.exit(failed.length ? 1 : 0);
 } else {
-	console.log("usage: qa-kit parts|fast [--all] | report | comment");
+	console.log("usage: qa-kit parts|fast [--all] | report | comment | pass | gate | mark");
 	process.exit(2);
 }
