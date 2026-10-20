@@ -32,7 +32,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       # SETUP: install the toolchain and dependencies, e.g. `uses: ./.github/actions/setup`
-      - run: npx --yes github:Boby-AI/qa-kit#v0.4.0 fast
+      - run: npx --yes github:Boby-AI/qa-kit#v0.5.1 fast
 
   kontrol:
     name: ${{ github.event_name == 'pull_request' && 'kontrol' || 'tam-tarama' }}
@@ -59,4 +59,4 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
-        run: npx --yes github:Boby-AI/qa-kit#v0.4.0 report
+        run: npx --yes github:Boby-AI/qa-kit#v0.5.1 report

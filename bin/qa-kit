@@ -63,7 +63,12 @@ function report() {
 	const pr = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8")).pull_request;
 	if (pr) {
 		const gh = (args, input) => spawnSync("gh", args, { input, stdio: ["pipe", "inherit", "inherit"] }).status;
-		gh(["pr", "comment", String(pr.number), "--edit-last", "--create-if-none", "--body-file", "-"], body);
+		// Replace the old report rather than edit it, so the newest one is always the last comment.
+		const marker = "<!-- qa-kit report -->";
+		const issue = `repos/${process.env.GITHUB_REPOSITORY}/issues/${pr.number}/comments`;
+		const old = execSync(`gh api --paginate ${issue} --jq '.[] | select(.body | startswith("${marker}")) | .id'`, { encoding: "utf8" });
+		for (const id of old.split("\n").filter(Boolean)) gh(["api", "-X", "DELETE", `repos/${process.env.GITHUB_REPOSITORY}/issues/comments/${id}`]);
+		gh(["pr", "comment", String(pr.number), "--body-file", "-"], `${marker}\n${body}`);
 		const comments = JSON.parse(read(".qa/comments.json", "[]")).map((c) => ({ ...c, side: "RIGHT" }));
 		const review = { commit_id: pr.head.sha, event: "COMMENT", body: "qa-kit reviewer", comments };
 		const url = `repos/${process.env.GITHUB_REPOSITORY}/pulls/${pr.number}/reviews`;
