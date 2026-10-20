@@ -36,7 +36,7 @@ If it is missing or its front matter lacks `status: approved`:
    - numbered acceptance criteria `K1`, `K2`, … — each one observable and testable;
    - an **Interface** section: the functions, endpoints, screens or element ids the tests may use.
 2. Show it to the owner in plain words and wait for approval. Apply their edits.
-3. Save it with front matter `status: approved`.
+3. Save it with front matter `status: approved` and commit it on its own, so the PR's CI run finds it.
 
 Never change an approved spec without the owner.
 
