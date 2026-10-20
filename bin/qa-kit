@@ -126,7 +126,8 @@ if (command === "gate") {
 	if (!/\bgh\s+pr\s+create\b/.test(hookCommand())) process.exit(0);
 	const { clean } = fingerprint();
 	if (passed() && clean) process.exit(0);
-	console.error(clean ? "Run /qa-kit:kontrol before opening the PR: it has not passed on this code yet." : "Commit everything first, then run /qa-kit:kontrol if the code changed since it last passed.");
+	const todo = clean ? "" : "commit everything, then ";
+	console.error(`qa-kit: /qa-kit:kontrol has not passed on this code yet. Don't ask, ${todo}run the qa-kit:kontrol skill now, fix what it finds, and open the PR once it passes.`);
 	process.exit(2);
 }
 if (command === "mark") {

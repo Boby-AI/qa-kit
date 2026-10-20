@@ -22,7 +22,7 @@ Projenin klasöründe `pnpm install` yaptıysanız göndermeden önceki kontrol 
 ## Günlük kullanım
 
 1. **Kod gönderirken (`git push`)** değişen parçaların hızlı testleri kendiliğinden çalışır. Hata varsa gönderim durur, ekranda nedeni yazar.
-2. **PR açmadan önce** Claude'da `/qa-kit:kontrol` yazın. Büyük işte size "ne isteniyordu" listesini gösterir, onaylarsınız; Tadımcı ve Sabotajcı bilgisayarınızda çalışır. Geçmeden Claude PR açmaz. Geçince commit'iniz GitHub'da **qa-kit/local** işaretini alır.
+2. **PR açmadan önce** kontrol çalışır: Claude'a "PR aç" deyince kendisi başlatır, isterseniz önceden `/qa-kit:kontrol` yazabilirsiniz. Büyük işte size "ne isteniyordu" listesini gösterir, onaylarsınız; Tadımcı ve Sabotajcı bilgisayarınızda çalışır. Geçmeden Claude PR açmaz. Geçince commit'iniz GitHub'da **qa-kit/local** işaretini alır.
 3. **PR açınca** GitHub'da sadece Okuyucu çalışır, birkaç dakikada biter. Taslak (draft) PR'da çalışmaz; **Ready for review** deyince çalışır.
 
 ## Raporu okumak
@@ -54,6 +54,6 @@ Büyük bir sürümden önce ya da arada bir "her şey yolunda mı" diye kullan�
 
 ## Sorun olursa
 
-- **Claude PR açmıyor, "/qa-kit:kontrol" diyor:** kontrol bu kodda henüz geçmedi ya da sonra kod değişti. Her şeyi commit'leyip `/qa-kit:kontrol` yazın.
+- **Claude PR açmadan önce kontrol çalıştırıyor:** kontrol bu kodda henüz geçmedi ya da sonra kod değişti. Beklemeniz yeterli.
 - **Göndermeden önceki kontrol bilgisayarınızda eksik bir araç yüzünden duruyor:** hata mesajında yazan aracı kurun. Acil durumda `git push --no-verify` ile geçebilirsiniz; PR'daki kontrol yine çalışır.
 - **Bir projeye eklemek:** projenin köküne `qa-kit.json` ekleyin ([README](README.md#project-config-qa-kitjson)).

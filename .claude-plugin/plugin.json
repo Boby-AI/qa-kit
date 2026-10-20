@@ -1,6 +1,6 @@
 {
   "name": "qa-kit",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "A code reviewer on every change, plus an independent tester and adversary that check bigger changes against their spec.",
   "author": { "name": "Boby AI" }
 }
