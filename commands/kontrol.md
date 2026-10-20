@@ -31,7 +31,7 @@ The spec lives at `<specs>/<branch>.md` (`/` in the branch name becomes `-`).
 
 If it is missing or its front matter lacks `status: approved`:
 
-1. Draft it from what the owner asked for (this conversation, the PR description, the issue), **not from the code**:
+1. Draft it from what the owner asked for (this conversation, the PR description, the issue, or a draft in the PR's qa-kit report), **not from the code**:
    - what the change is for, in two or three sentences;
    - numbered acceptance criteria `K1`, `K2`, … — each one observable and testable;
    - an **Interface** section: the functions, endpoints, screens or element ids the tests may use.
@@ -67,4 +67,4 @@ When everything passes, the last step is the owner's: they try it and say "oldu"
 
 ## In CI
 
-When the `CI` environment variable is set, nobody is there to approve. Skip step 3 (CI runs the fast checks in its own job). No changed files passes. A small change passes unless the reviewer finds a blocker. A big change without an approved spec fails with "spec needed". Never fix code. End by writing `.qa/verdict` containing `pass` or `fail` (fail on any failing criterion or any blocker from the reviewer or adversary), and put the report in `.qa/report.md`. Also write `.qa/comments.json`: an array with one `{"path", "line", "body"}` per reviewer finding whose line is in the diff (new side), where `body` is the severity and a one-line title in bold, what goes wrong, then the fix prompt inside `<details><summary>Prompt to fix with AI</summary>` … `</details>`. `qa-kit report` posts these as inline comments.
+When the `CI` environment variable is set, nobody is there to approve. Skip step 3 (CI runs the fast checks in its own job). No changed files passes. A small change passes unless the reviewer finds a blocker. A big change without an approved spec fails with "spec needed": draft the spec from the PR title and description (never the code), put it in the report, and say to run `/kontrol` locally to approve it. Never fix code. End by writing `.qa/verdict` containing `pass` or `fail` (fail on any failing criterion or any blocker from the reviewer or adversary), and put the report in `.qa/report.md`. Also write `.qa/comments.json`: an array with one `{"path", "line", "body"}` per reviewer finding whose line is in the diff (new side), where `body` is the severity and a one-line title in bold, what goes wrong, then the fix prompt inside `<details><summary>Prompt to fix with AI</summary>` … `</details>`. `qa-kit report` posts these as inline comments.
