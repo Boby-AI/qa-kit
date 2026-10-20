@@ -56,7 +56,8 @@ Tell the owner, simply:
 
 - fast checks: pass/fail;
 - each criterion: pass/fail;
-- the adversary's findings by severity, and what held up.
+- the adversary's findings by severity, and what held up;
+- for each real bug, a **fix prompt** in a code block that someone can paste into a fresh Claude session as is: the criterion ID, what should happen, what happens instead, the command that reproduces it (the failing `qa-spec` test or repro file), and these rules: fix the code, never edit `qa-spec` tests, the repro or the spec, then run `/kontrol` again. Describe the behaviour, not a guessed code location.
 
 Real bugs → fix the **code**, then run `/kontrol` again. Never edit the tester's `qa-spec` tests or the adversary's repros to make them pass; if you think one is wrong, say why and let the owner decide.
 
