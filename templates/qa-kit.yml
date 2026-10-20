@@ -3,7 +3,10 @@
 name: qa-kit
 
 on:
+  # Only PRs into the branch qa-kit.json calls "base": a release PR (main → production) carries
+  # code that was already checked on its way into main.
   pull_request:
+    branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
     inputs:
@@ -32,7 +35,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       # SETUP: install the toolchain and dependencies, e.g. `uses: ./.github/actions/setup`
-      - run: npx --yes github:Boby-AI/qa-kit#v0.5.3 fast
+      - run: npx --yes github:Boby-AI/qa-kit#v0.5.4 fast
 
   kontrol:
     name: ${{ github.event_name == 'pull_request' && 'kontrol' || 'tam-tarama' }}
@@ -59,4 +62,4 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           GH_TOKEN: ${{ github.token }}
-        run: npx --yes github:Boby-AI/qa-kit#v0.5.3 report
+        run: npx --yes github:Boby-AI/qa-kit#v0.5.4 report
