@@ -1,0 +1,14 @@
+{
+  "name": "boby",
+  "description": "Boby AI's shared Claude Code plugins.",
+  "owner": {
+    "name": "Boby AI"
+  },
+  "plugins": [
+    {
+      "name": "qa-kit",
+      "source": "./",
+      "description": "Independent tester and adversary that check a change against its spec before it lands."
+    }
+  ]
+}

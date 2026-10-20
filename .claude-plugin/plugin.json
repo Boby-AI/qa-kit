@@ -1,0 +1,6 @@
+{
+  "name": "qa-kit",
+  "version": "0.1.0",
+  "description": "Independent tester and adversary that check a change against its spec before it lands.",
+  "author": { "name": "Boby AI" }
+}

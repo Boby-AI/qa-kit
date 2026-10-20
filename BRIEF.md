@@ -1,6 +1,7 @@
 # qa-kit — brief
 
-Owner's plan, agreed in conversation on 2026-10-20. Nothing is built yet.
+Owner's plan, agreed in conversation on 2026-10-20. Built so far: the plugin (tester, adversary, `/kontrol`),
+not yet tried in a project. Git hook and PR gate come after the trial.
 
 ## Goal
 
@@ -38,20 +39,20 @@ Small changes (a colour, a text) skip this. Anything that touches money, rewards
 
 ## Projects that will use it
 
-| Project | Parts | Notes |
-|---|---|---|
-| PlayMate (`../play-mate`) | Flutter app, Cloud Functions, HTML5 games | Games already follow the process; the app has no tests yet |
-| Director | web, app, dashboard | Possibly `../directorai`, confirm |
-| Shiny AI | app, dashboard | |
+All repos are in the `Boby-AI` GitHub organisation. Test-file counts are from 2026-10-20.
+
+| Project | Repo(s) | Parts | Tests today |
+|---|---|---|---|
+| Director | `directorai` (pnpm + Turbo monorepo) | `apps/web`, `apps/dashboard` (Next.js), `apps/native` (Expo / React Native), `apps/server` (Hono), `apps/executor`, `apps/agent`, shared `packages/*` | ~234 files, vitest per app; lefthook pre-commit (biome + custom checks) |
+| Shiny AI | `xart` | Flutter app (root), `dashboard/` (Next.js), `supabase/` | ~20 Flutter tests, ~11 dashboard (vitest) |
+| PlayMate | `play-mate` (old `play-mate-functions` and `play_mate_games` are merged in and abandoned) | Flutter app (root), `backend/` (Cloud Functions), `games/` (HTML5) | ~48, all in `games/`; none in the app or backend |
 
 The other developers work in React.
 
-## Open questions for the owner
+## Decided
 
-1. Stack of each part: are the Director and Shiny AI apps React Native, Flutter or something else? Web and dashboards React?
-2. Where do the repos live: one GitHub organisation? Is Director one repo or several?
-3. Which projects already have tests?
-4. Once a team works in a repo, PlayMate's "push straight to main" rule becomes "open a PR". The owner has not approved that yet.
+- Work lands through PRs, not straight pushes to main (approved 2026-10-20).
+- Existing hooks (e.g. lefthook in `directorai`) are reused, not replaced by Husky.
 
 ## Working with the owner
 
