@@ -79,4 +79,4 @@ or
 1. <the problem in plain words, one line> (`file:line`)
 ```
 
-List only blockers and majors, one line each. Everything else (criteria tested, minors, what held up, fix prompts) goes inside one `<details><summary>Details</summary>` block below. Also write `.qa/comments.json`: an array with one `{"path", "line", "body"}` per blocker or major reviewer finding whose line is in the diff (new side); minors stay in the details, where `body` is the severity and a one-line title in bold, what goes wrong, then the fix prompt inside `<details><summary>Prompt to fix with AI</summary>` … `</details>`. `qa-kit report` posts these as inline comments.
+List only blockers and majors, one line each. Everything else (criteria tested, minors, what held up, fix prompts) goes inside one `<details><summary>Details</summary>` block below. The reviewer and adversary already posted their blockers and majors as PR comments while they ran; don't post them again.

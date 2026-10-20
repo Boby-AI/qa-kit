@@ -33,7 +33,9 @@ Rapor PR'ın **en son yorumudur**:
 - `❌ Needs a fix`: altında düzeltilmesi gerekenler, her biri bir satır.
 - **Details**: tıklayınca açılır. İçinde test edilen maddeler, küçük öneriler ve **her hata için Claude'a yapıştırılacak hazır düzeltme komutu** vardır.
 
-Okuyucunun notları **Files changed** sekmesinde ilgili satırın altındadır. Her notta **Prompt to fix with AI** açılır kutusu vardır: kopyalayın, Claude'a yapıştırın.
+**Beklemeden başlayın:** Okuyucu ve Sabotajcı ciddi bir hata bulunca raporu beklemez, hemen PR'a not düşer. Rapor gelmeden ilk notları görürseniz düzeltmeye başlayabilirsiniz.
+
+Okuyucunun notları **Files changed** sekmesinde ilgili satırın altındadır; Sabotajcınınkiler PR'ın yorumlarındadır. Her notta **Prompt to fix with AI** açılır kutusu vardır: kopyalayın, Claude'a yapıştırın.
 
 Kurallar:
 

@@ -32,4 +32,6 @@ Skip style and formatting; linters own those. Report only what you would defend:
 
 A list, most severe first. For each: severity (**blocker**: a real bug or hole; **major**: likely bug or missing safeguard; **minor**: worth fixing, not urgent) · `file:line` · what goes wrong · a paste-ready fix prompt in a code block (what is wrong, where, what correct looks like, and "run `/kontrol` again after the fix").
 
+In CI (`CI` set), post each blocker and major the moment you are sure of it, so the author can start fixing while the run goes on: pipe `{"path", "line", "body"}` to `qa-kit comment` (also at `${CLAUDE_PLUGIN_ROOT}/bin/qa-kit`), with the finding's new-side line. `body` is, in the language of the PR description: the severity and a one-line title in bold, what goes wrong, then the fix prompt inside `<details><summary>Prompt to fix with AI</summary>` … `</details>`.
+
 End with "Looked at, fine": the risky spots you checked that held up. Never edit code.
