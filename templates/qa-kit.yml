@@ -1,5 +1,6 @@
 # Copy to .github/workflows/qa-kit.yml and replace the SETUP step with the project's own.
-# Needs the ANTHROPIC_API_KEY secret. Make "qa-kit / kontrol" a required check on main.
+# Needs the ANTHROPIC_API_KEY secret and `.qa/` plus `.qa-kit/` in .gitignore. Make "kontrol" a required
+# check on main.
 name: qa-kit
 
 on:
@@ -18,6 +19,10 @@ permissions:
   contents: read
   pull-requests: write
 
+# The plugin, the report tool and the pre-push hook run one qa-kit release: bump it here and there together.
+env:
+  QA_KIT_REF: v0.5.5
+
 # A new push cancels the run for the old one, so an older report never overwrites a newer one.
 concurrency:
   group: qa-kit-${{ github.ref }}
@@ -35,7 +40,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       # SETUP: install the toolchain and dependencies, e.g. `uses: ./.github/actions/setup`
-      - run: npx --yes github:Boby-AI/qa-kit#v0.5.5 fast
+      - run: npx --yes "github:Boby-AI/qa-kit#${QA_KIT_REF}" fast
 
   kontrol:
     name: ${{ github.event_name == 'pull_request' && 'kontrol' || 'tam-tarama' }}
@@ -50,11 +55,20 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       # SETUP: same as above
+      # The plugin from the pinned release rather than qa-kit's default branch: it runs with this
+      # workflow's secrets. The action takes a marketplace URL only without a ref, so the release is
+      # checked out and installed from its path.
+      - uses: actions/checkout@v4
+        with:
+          repository: Boby-AI/qa-kit
+          ref: ${{ env.QA_KIT_REF }}
+          path: .qa-kit
+          persist-credentials: false
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          plugin_marketplaces: https://github.com/Boby-AI/qa-kit.git
+          plugin_marketplaces: ${{ github.workspace }}/.qa-kit
           plugins: qa-kit@boby
           prompt: ${{ github.event_name == 'pull_request' && '/qa-kit:kontrol' || format('/qa-kit:tam-tarama {0}', inputs.parts) }}
           claude_args: --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Agent"
@@ -62,4 +76,4 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           GH_TOKEN: ${{ github.token }}
-        run: npx --yes github:Boby-AI/qa-kit#v0.5.5 report
+        run: npx --yes "github:Boby-AI/qa-kit#${QA_KIT_REF}" report
