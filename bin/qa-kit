@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // qa-kit parts [--all]  → prints the parts the change touches, as JSON
 // qa-kit fast  [--all]  → runs those parts' fast commands; exits 1 if any fails
+// qa-kit report         → CI: posts the /kontrol report and inline comments to the PR
 import { execSync, spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import { join, matchesGlob } from "node:path";
 
 const [command, ...flags] = process.argv.slice(2);
@@ -51,6 +52,30 @@ function affectedParts() {
 	return parts.filter(([name]) => touched.has(name));
 }
 
+// CI only: posts .qa/report.md as the PR comment and .qa/comments.json as inline review comments,
+// then fails unless .qa/verdict says pass.
+function report() {
+	const read = (file, fallback) => {
+		return existsSync(file) ? readFileSync(file, "utf8") : fallback;
+	};
+	const body = read(".qa/report.md", "qa-kit wrote no report.");
+	if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, body);
+	const pr = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8")).pull_request;
+	if (pr) {
+		const gh = (args, input) => spawnSync("gh", args, { input, stdio: ["pipe", "inherit", "inherit"] }).status;
+		gh(["pr", "comment", String(pr.number), "--edit-last", "--create-if-none", "--body-file", "-"], body);
+		const comments = JSON.parse(read(".qa/comments.json", "[]")).map((c) => ({ ...c, side: "RIGHT" }));
+		const review = { commit_id: pr.head.sha, event: "COMMENT", body: "qa-kit reviewer", comments };
+		const url = `repos/${process.env.GITHUB_REPOSITORY}/pulls/${pr.number}/reviews`;
+		if (comments.length && gh(["api", url, "--input", "-"], JSON.stringify(review)) !== 0) {
+			console.error("⚠ Inline comments were refused (a line outside the diff?); they are still in the report.");
+		}
+	}
+	process.exit(read(".qa/verdict", "").trim() === "pass" ? 0 : 1);
+}
+
+if (command === "report") report();
+
 const affected = affectedParts();
 for (const dir of uncoveredTestFolders()) console.error(`⚠ qa-kit.json: ${dir || "./"} has tests but no part covers it`);
 
@@ -68,6 +93,6 @@ if (command === "parts") {
 	for (const f of failed) console.log(`  ✗ ${f}`);
 	process.exit(failed.length ? 1 : 0);
 } else {
-	console.log("usage: qa-kit parts|fast [--all]");
+	console.log("usage: qa-kit parts|fast [--all] | report");
 	process.exit(2);
 }

@@ -14,6 +14,11 @@ permissions:
   contents: read
   pull-requests: write
 
+# A new push cancels the run for the old one, so an older report never overwrites a newer one.
+concurrency:
+  group: qa-kit-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   fast:
     name: fast
@@ -24,17 +29,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       # SETUP: install the toolchain and dependencies, e.g. `uses: ./.github/actions/setup`
-      - run: npx --yes github:Boby-AI/qa-kit fast
+      - run: npx --yes github:Boby-AI/qa-kit#v0.4.0 fast
 
   kontrol:
     name: ${{ github.event_name == 'pull_request' && 'kontrol' || 'tam-tarama' }}
+    # Fork and Dependabot PRs get no secrets, so they are skipped rather than always red.
+    if: github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]')
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       # SETUP: same as above
       - uses: anthropics/claude-code-action@v1
         with:
@@ -48,10 +57,4 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p .qa; [ -f .qa/report.md ] || echo "qa-kit wrote no report." > .qa/report.md
-          cat .qa/report.md >> "$GITHUB_STEP_SUMMARY"
-          if [ "${{ github.event_name }}" = pull_request ]; then
-            gh pr comment ${{ github.event.pull_request.number }} --edit-last --create-if-none --body-file .qa/report.md
-          fi
-          [ "$(cat .qa/verdict 2>/dev/null)" = pass ]
+        run: npx --yes github:Boby-AI/qa-kit#v0.4.0 report

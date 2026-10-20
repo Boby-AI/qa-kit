@@ -27,13 +27,13 @@ To try a local copy instead, use `claude plugin marketplace add /path/to/qa-kit`
 
 ## Automatic checks
 
-- **Before push:** add a pre-push hook that runs `npx --yes github:Boby-AI/qa-kit fast` (only the changed parts' fast commands). With lefthook:
+- **Before push:** add a pre-push hook that runs `npx --yes github:Boby-AI/qa-kit#v0.4.0 fast` (only the changed parts' fast commands). With lefthook:
 
   ```yaml
   pre-push:
     jobs:
       - name: qa-kit
-        run: npx --yes github:Boby-AI/qa-kit fast
+        run: npx --yes github:Boby-AI/qa-kit#v0.4.0 fast
   ```
 
 - **On PR, and the full-scan button:** copy [`templates/qa-kit.yml`](templates/qa-kit.yml) to `.github/workflows/`, fill in its setup steps, add the `ANTHROPIC_API_KEY` secret, and make the `kontrol` check required on `main`. "Run workflow" on the Actions tab starts a full scan.
