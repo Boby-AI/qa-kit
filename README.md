@@ -19,7 +19,7 @@ To try a local copy instead, use `claude plugin marketplace add /path/to/qa-kit`
 2. runs those parts' fast checks;
 3. has the reviewer read the diff, like a careful senior reviewer (every change, including config);
 4. stops there for small changes (copy, colours);
-5. for bigger ones, drafts a spec with numbered criteria (`K1`, `K2`, …), which the owner approves;
+5. for bigger ones, drafts a spec with numbered criteria (`K1`, `K2`, …), which the owner approves (on a PR without one, CI drafts it from the PR description and carries on);
 6. runs the tester (writes `qa-spec` tests from the spec only) and the adversary (tries to break it) in parallel;
 7. reports, with a paste-ready fix prompt per bug. The owner tries it and says "oldu".
 
