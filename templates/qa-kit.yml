@@ -56,7 +56,7 @@ jobs:
           prompt: ${{ github.event_name == 'pull_request' && '/qa-kit:kontrol' || format('/qa-kit:tam-tarama {0}', inputs.parts) }}
           claude_args: --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Agent"
       - name: Report
-        if: always()
+        if: ${{ !cancelled() }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: npx --yes github:Boby-AI/qa-kit#v0.5.1 report
