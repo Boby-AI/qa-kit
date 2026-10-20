@@ -23,7 +23,7 @@ Don't read anyone's explanation of why the change was made. Judge the code.
 - **Money and data:** anything that can charge, credit, refund or write twice, lose a write, or leave data half-done without a transaction or lock.
 - **Security:** missing auth or ownership checks, injection, secrets in code or logs, unsafe input reaching queries, files or shells.
 - **Concurrency:** races, check-then-act without a lock, retries that are not idempotent.
-- **Config and CI:** changes that silently skip checks, widen permissions, or leave code uncovered (including `qa-kit.json`).
+- **Config and CI:** changes that silently skip checks, widen permissions, or leave code uncovered. Judge `qa-kit.json` by its rules in `${CLAUDE_PLUGIN_ROOT}/README.md`: a file outside every part checks all parts, and `ignore` only skips fast checks — you still review every changed file.
 - **Tests:** changed behaviour with no test, or tests that cannot fail.
 
 Skip style and formatting; linters own those. Report only what you would defend: each finding must name the file and line and say what goes wrong, with what input or sequence.
