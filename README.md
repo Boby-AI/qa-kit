@@ -47,6 +47,7 @@ Put it at the repo root. It names only the project's own commands.
   "specs": "docs/specs",
   "findings": ".qa/findings",
   "sensitive": ["packages/billing/**", "**/payments/**"],
+  "ignore": ["docs/**", ".github/**"],
   "parts": {
     "web": {
       "path": "apps/web",
@@ -72,6 +73,7 @@ Put it at the repo root. It names only the project's own commands.
 | `specs` | Folder for approved specs, one per branch. |
 | `findings` | Folder for the adversary's repros and `findings.md`. |
 | `sensitive` | Globs that always get the full check (money, rewards, payments, data). |
+| `ignore` | Optional globs that never trigger checks, e.g. `docs/**`, `.github/**`. |
 | `parts.<name>.path` | Folder of the part. Files outside every part count as shared and check all parts. |
 | `kind` | `web`, `mobile`, `api`, `game` or `lib`; picks the adversary's attacks. |
 | `fast` | Quick commands (format, lint, types, tests). |

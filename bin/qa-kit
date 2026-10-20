@@ -3,7 +3,7 @@
 // qa-kit fast  [--all]  → runs those parts' fast commands; exits 1 if any fails
 import { execSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, matchesGlob } from "node:path";
 
 const [command, ...flags] = process.argv.slice(2);
 const all = flags.includes("--all");
@@ -17,8 +17,9 @@ function changedFiles() {
 	const base = git(`merge-base origin/${config.base} HEAD`);
 	const lists = [`diff --name-only ${base}`, "diff --name-only HEAD", "ls-files --others --exclude-standard"];
 	const files = new Set(lists.flatMap((args) => git(args).split("\n")).filter(Boolean));
+	const globs = [...(config.ignore ?? []), `${config.specs}/**`, `${config.findings}/**`];
 	const ignored = (file) => {
-		return file === "qa-kit.json" || [config.specs, config.findings].some((dir) => dir && file.startsWith(`${dir}/`));
+		return file === "qa-kit.json" || globs.some((glob) => matchesGlob(file, glob));
 	};
 	return [...files].filter((file) => !ignored(file));
 }
