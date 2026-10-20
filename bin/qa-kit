@@ -24,9 +24,24 @@ function changedFiles() {
 	return [...files].filter((file) => !ignored(file));
 }
 
+const inPart = (file, path) => path === "." || file.startsWith(`${path}/`);
+
+// Folders with their own tests that no part covers would go unchecked without anyone noticing.
+function uncoveredTestFolders() {
+	const tracked = git("ls-files").split("\n");
+	const hasTests = (file) => {
+		const dir = file.slice(0, file.lastIndexOf("/") + 1);
+		if (file.endsWith("pubspec.yaml")) return tracked.some((f) => f.startsWith(`${dir}test/`));
+		return file.endsWith("package.json") && Boolean(JSON.parse(readFileSync(file, "utf8")).scripts?.test);
+	};
+	const dirs = tracked.filter((f) => /(^|\/)(package\.json|pubspec\.yaml)$/.test(f) && hasTests(f)).map((f) => f.slice(0, f.lastIndexOf("/") + 1));
+	// The root of a multi-package repo only runs the others' tests.
+	const own = dirs.length > 1 ? dirs.filter((dir) => dir !== "") : dirs;
+	return own.filter((dir) => !parts.some(([, part]) => inPart(dir || "./", part.path)));
+}
+
 function affectedParts() {
 	if (all) return parts;
-	const inPart = (file, path) => path === "." || file.startsWith(`${path}/`);
 	const touched = new Set();
 	for (const file of changedFiles()) {
 		const owners = parts.filter(([, part]) => inPart(file, part.path));
@@ -37,6 +52,7 @@ function affectedParts() {
 }
 
 const affected = affectedParts();
+for (const dir of uncoveredTestFolders()) console.error(`⚠ qa-kit.json: ${dir || "./"} has tests but no part covers it`);
 
 if (command === "parts") {
 	console.log(JSON.stringify(Object.fromEntries(affected), null, 2));

@@ -1,6 +1,6 @@
 # qa-kit
 
-A Claude Code plugin: an independent **tester** and **adversary** check a change against its approved spec before it lands. The doer never grades their own work. Background in [`BRIEF.md`](BRIEF.md).
+A Claude Code plugin: a **reviewer** reads every change, and for bigger ones an independent **tester** and **adversary** check it against its approved spec before it lands. The doer never grades their own work. Background in [`BRIEF.md`](BRIEF.md).
 
 ## Install
 
@@ -17,10 +17,11 @@ To try a local copy instead, use `claude plugin marketplace add /path/to/qa-kit`
 
 1. finds what changed since the base branch and which parts it touches;
 2. runs those parts' fast checks;
-3. stops there for small changes (copy, colours);
-4. for bigger ones, drafts a spec with numbered criteria (`K1`, `K2`, …), which the owner approves;
-5. runs the tester (writes `qa-spec` tests from the spec only) and the adversary (tries to break it) in parallel;
-6. reports. The owner tries it and says "oldu".
+3. has the reviewer read the diff, like a careful senior reviewer (every change, including config);
+4. stops there for small changes (copy, colours);
+5. for bigger ones, drafts a spec with numbered criteria (`K1`, `K2`, …), which the owner approves;
+6. runs the tester (writes `qa-spec` tests from the spec only) and the adversary (tries to break it) in parallel;
+7. reports, with a paste-ready fix prompt per bug. The owner tries it and says "oldu".
 
 `/tam-tarama` scans the whole project instead of a change: every part's fast checks, then the adversary on each part.
 
@@ -74,7 +75,7 @@ Put it at the repo root. It names only the project's own commands.
 | `findings` | Folder for the adversary's repros and `findings.md`. |
 | `sensitive` | Globs that always get the full check (money, rewards, payments, data). |
 | `ignore` | Optional globs that never trigger checks, e.g. `docs/**`, `.github/**`. |
-| `parts.<name>.path` | Folder of the part. Files outside every part count as shared and check all parts. |
+| `parts.<name>.path` | Folder of the part. Files outside every part count as shared and check all parts. `qa-kit` warns about any folder with its own tests that no part covers. |
 | `kind` | `web`, `mobile`, `api`, `game` or `lib`; picks the adversary's attacks. |
 | `fast` | Quick commands (format, lint, types, tests). |
 | `test` | How the tester runs tests. |
