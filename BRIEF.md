@@ -43,7 +43,7 @@ All repos are in the `Boby-AI` GitHub organisation. Test-file counts are from 20
 | Project | Repo(s) | Parts | Tests today |
 |---|---|---|---|
 | Director | `directorai` (pnpm + Turbo monorepo) | `apps/web`, `apps/dashboard` (Next.js), `apps/native` (Expo / React Native), `apps/server` (Hono), `apps/executor`, `apps/agent`, shared `packages/*` | ~234 files, vitest per app; lefthook pre-commit (biome + custom checks) |
-| Shiny AI | `xart` | Flutter app (root), `dashboard/` (Next.js), `supabase/` | ~20 Flutter tests, ~11 dashboard (vitest) |
+| Shiny AI | `shinyai` (pnpm + Turbo monorepo; `xart` is the older Flutter app) | `apps/native` (Expo / React Native), `apps/dashboard` (Next.js), `supabase/` | ~44 files, vitest |
 | PlayMate | `play-mate` (old `play-mate-functions` and `play_mate_games` are merged in and abandoned) | Flutter app (root), `backend/` (Cloud Functions), `games/` (HTML5) | ~48, all in `games/`; none in the app or backend |
 
 The other developers work in React.
