@@ -23,7 +23,7 @@ Projenin klasöründe `pnpm install` yaptıysanız göndermeden önceki kontrol 
 
 1. **Kod gönderirken (`git push`)** değişen parçaların hızlı testleri kendiliğinden çalışır. Hata varsa gönderim durur, ekranda nedeni yazar.
 2. **PR açınca** bir şey yapmanıza gerek yok. Taslak (draft) PR'da çalışmaz; **Ready for review** deyince çalışır. Mevcut testlerle aynı anda yürür.
-3. **İsterseniz önce kendiniz:** Claude'da `/kontrol` yazın. Büyük işte size "ne isteniyordu" listesini gösterir; onaylarsanız PR o listeyle test edilir. Yazmazsanız GitHub listeyi PR açıklamasından kendisi çıkarır.
+3. **İsterseniz önce kendiniz:** Claude'da `/qa-kit:kontrol` yazın. Büyük işte size "ne isteniyordu" listesini gösterir; onaylarsanız PR o listeyle test edilir. Yazmazsanız GitHub listeyi PR açıklamasından kendisi çıkarır.
 
 ## Raporu okumak
 
@@ -45,12 +45,14 @@ Kurallar:
 Normal kontrol sadece değişen yere bakar. Tüm projeyi taramak için:
 
 - **GitHub'dan:** repoda **Actions** → soldan **qa-kit** → **Run workflow**. Bir parça adı yazabilir (ör. `native`) ya da boş bırakıp her yeri taratabilirsiniz. 20-40 dakika sürer; rapor o çalıştırmanın **Summary** sayfasındadır.
-- **Bilgisayarınızdan:** Claude'da `/tam-tarama` (ya da `/tam-tarama native`).
+- **Bilgisayarınızdan:** Claude'da `/qa-kit:tam-tarama`. Sadece bazı parçalar için adlarını yazın: `/qa-kit:tam-tarama native` ya da `/qa-kit:tam-tarama billing api`.
+
+Parça adları projenin kökündeki `qa-kit.json` dosyasında, `parts` altında yazar.
 
 Büyük bir sürümden önce ya da arada bir "her şey yolunda mı" diye kullanın.
 
 ## Sorun olursa
 
-- **"spec" ya da liste ile ilgili bir şey soruyor:** `/kontrol` yazıp gösterdiği listeyi onaylayın.
+- **"spec" ya da liste ile ilgili bir şey soruyor:** `/qa-kit:kontrol` yazıp gösterdiği listeyi onaylayın.
 - **Göndermeden önceki kontrol bilgisayarınızda eksik bir araç yüzünden duruyor:** hata mesajında yazan aracı kurun. Acil durumda `git push --no-verify` ile geçebilirsiniz; PR'daki kontrol yine çalışır.
 - **Bir projeye eklemek:** projenin köküne `qa-kit.json` ekleyin ([README](README.md#project-config-qa-kitjson)).

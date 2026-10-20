@@ -13,7 +13,7 @@ To try a local copy instead, use `claude plugin marketplace add /path/to/qa-kit`
 
 ## Use
 
-`/kontrol` in a project:
+`/qa-kit:kontrol` in a project:
 
 1. finds what changed since the base branch and which parts it touches;
 2. runs those parts' fast checks;
@@ -23,7 +23,7 @@ To try a local copy instead, use `claude plugin marketplace add /path/to/qa-kit`
 6. runs the tester (writes `qa-spec` tests from the spec only) and the adversary (tries to break it) in parallel;
 7. reports, with a paste-ready fix prompt per bug. The owner tries it and says "oldu".
 
-`/tam-tarama` scans the whole project instead of a change: every part's fast checks, then the adversary on each part.
+`/qa-kit:tam-tarama [parts]` scans the whole project instead of a change: every part's fast checks, then the adversary on each part.
 
 ## Automatic checks
 
