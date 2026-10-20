@@ -52,6 +52,10 @@ The other developers work in React.
 
 - Work lands through PRs, not straight pushes to main (approved 2026-10-20).
 - Existing hooks (e.g. lefthook in `directorai`) are reused, not replaced by Husky.
+- A reviewer agent reads every change (Greptile-style inline comments with fix prompts); tester and adversary run on big changes.
+- CI never blocks on a missing spec: PR descriptions are written by Claude anyway, so CI drafts the criteria from the PR
+  description and tests against them, listing them at the top of the report. Owner approval stays optional locally (`/kontrol`).
+- Draft PRs wait for "Ready for review". Money is not the constraint; signal over noise is.
 
 ## Working with the owner
 
