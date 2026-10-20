@@ -68,7 +68,8 @@ function report() {
 		const issue = `repos/${process.env.GITHUB_REPOSITORY}/issues/${pr.number}/comments`;
 		const old = execSync(`gh api --paginate ${issue} --jq '.[] | select(.body | startswith("${marker}")) | .id'`, { encoding: "utf8" });
 		for (const id of old.split("\n").filter(Boolean)) gh(["api", "-X", "DELETE", `repos/${process.env.GITHUB_REPOSITORY}/issues/comments/${id}`]);
-		gh(["pr", "comment", String(pr.number), "--body-file", "-"], `${marker}\n${body}`);
+		const help = "\n\n<sub>[qa-kit nedir, rapor nasıl okunur?](https://github.com/Boby-AI/qa-kit/blob/main/KILAVUZ.md)</sub>";
+		gh(["pr", "comment", String(pr.number), "--body-file", "-"], `${marker}\n${body}${help}`);
 		const comments = JSON.parse(read(".qa/comments.json", "[]")).map((c) => ({ ...c, side: "RIGHT" }));
 		const review = { commit_id: pr.head.sha, event: "COMMENT", body: "qa-kit reviewer", comments };
 		const url = `repos/${process.env.GITHUB_REPOSITORY}/pulls/${pr.number}/reviews`;

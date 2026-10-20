@@ -1,6 +1,6 @@
 {
   "name": "qa-kit",
-  "version": "0.5.1",
+  "version": "0.5.3",
   "private": true,
   "type": "module",
   "bin": { "qa-kit": "bin/qa-kit" }
