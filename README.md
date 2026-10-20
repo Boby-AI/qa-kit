@@ -22,6 +22,21 @@ To try a local copy instead, use `claude plugin marketplace add /path/to/qa-kit`
 5. runs the tester (writes `qa-spec` tests from the spec only) and the adversary (tries to break it) in parallel;
 6. reports. The owner tries it and says "oldu".
 
+`/tam-tarama` scans the whole project instead of a change: every part's fast checks, then the adversary on each part.
+
+## Automatic checks
+
+- **Before push:** add a pre-push hook that runs `npx --yes github:Boby-AI/qa-kit fast` (only the changed parts' fast commands). With lefthook:
+
+  ```yaml
+  pre-push:
+    jobs:
+      - name: qa-kit
+        run: npx --yes github:Boby-AI/qa-kit fast
+  ```
+
+- **On PR, and the full-scan button:** copy [`templates/qa-kit.yml`](templates/qa-kit.yml) to `.github/workflows/`, fill in its setup steps, add the `ANTHROPIC_API_KEY` secret, and make the `kontrol` check required on `main`. "Run workflow" on the Actions tab starts a full scan.
+
 ## Project config: `qa-kit.json`
 
 Put it at the repo root. It names only the project's own commands.

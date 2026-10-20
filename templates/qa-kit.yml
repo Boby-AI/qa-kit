@@ -1,0 +1,57 @@
+# Copy to .github/workflows/qa-kit.yml and replace the SETUP step with the project's own.
+# Needs the ANTHROPIC_API_KEY secret. Make "qa-kit / kontrol" a required check on main.
+name: qa-kit
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      parts:
+        description: Parts to scan (empty = all)
+        required: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  fast:
+    name: fast
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # SETUP: install the toolchain and dependencies, e.g. `uses: ./.github/actions/setup`
+      - run: npx --yes github:Boby-AI/qa-kit fast
+
+  kontrol:
+    name: ${{ github.event_name == 'pull_request' && 'kontrol' || 'tam-tarama' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # SETUP: same as above
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          plugin_marketplaces: https://github.com/Boby-AI/qa-kit.git
+          plugins: qa-kit@boby
+          prompt: ${{ github.event_name == 'pull_request' && '/qa-kit:kontrol' || format('/qa-kit:tam-tarama {0}', inputs.parts) }}
+          claude_args: --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Agent"
+      - name: Report
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .qa; [ -f .qa/report.md ] || echo "qa-kit wrote no report." > .qa/report.md
+          cat .qa/report.md >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ github.event_name }}" = pull_request ]; then
+            gh pr comment ${{ github.event.pull_request.number }} --edit-last --create-if-none --body-file .qa/report.md
+          fi
+          [ "$(cat .qa/verdict 2>/dev/null)" = pass ]

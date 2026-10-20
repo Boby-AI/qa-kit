@@ -13,15 +13,11 @@ Read `qa-kit.json` at the repo root (schema in the qa-kit plugin's README). If i
 
 ## 2. What changed
 
-Changed files = committed since `git merge-base origin/<base> HEAD`, plus staged, unstaged and untracked. Leave out `qa-kit.json` and files under `specs` and `findings`.
-
-Map each file to the part whose `path` contains it. A file in no part is shared code: every part is affected. If arguments name parts, keep only those.
-
-Nothing changed → say so and stop.
+Run `qa-kit parts` (on PATH from this plugin; also at `${CLAUDE_PLUGIN_ROOT}/bin/qa-kit`). It prints the affected parts' entries. If arguments name parts, keep only those. Nothing changed → say so and stop.
 
 ## 3. Fast checks
 
-Run every `fast` command of each affected part and wait for all of them before step 6, so their results never mix with the tester's new files. Report failures; they must be fixed before going on, unless they come from the machine (a missing tool) rather than the change.
+Run `qa-kit fast` and wait for it to finish before step 6, so its results never mix with the tester's new files. Report failures; they must be fixed before going on, unless they come from the machine (a missing tool) rather than the change.
 
 ## 4. Small or big?
 
@@ -65,3 +61,7 @@ Tell the owner, simply:
 Real bugs → fix the **code**, then run `/kontrol` again. Never edit the tester's `qa-spec` tests or the adversary's repros to make them pass; if you think one is wrong, say why and let the owner decide.
 
 When everything passes, the last step is the owner's: they try it and say "oldu".
+
+## In CI
+
+When the `CI` environment variable is set, nobody is there to approve. Skip step 3 (CI runs the fast checks in its own job). A big change without an approved spec fails with "spec needed". Never fix code. End by writing `.qa/verdict` containing `pass` or `fail` (fail on any failing criterion or blocker finding), and put the report in `.qa/report.md`.

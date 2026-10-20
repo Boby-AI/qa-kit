@@ -1,0 +1,56 @@
+#!/usr/bin/env node
+// qa-kit parts [--all]  → prints the parts the change touches, as JSON
+// qa-kit fast  [--all]  → runs those parts' fast commands; exits 1 if any fails
+import { execSync, spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
+const [command, ...flags] = process.argv.slice(2);
+const all = flags.includes("--all");
+const git = (args) => execSync(`git ${args}`, { encoding: "utf8" }).trim();
+const root = git("rev-parse --show-toplevel");
+process.chdir(root);
+const config = JSON.parse(readFileSync(join(root, "qa-kit.json"), "utf8"));
+const parts = Object.entries(config.parts);
+
+function changedFiles() {
+	const base = git(`merge-base origin/${config.base} HEAD`);
+	const lists = [`diff --name-only ${base}`, "diff --name-only HEAD", "ls-files --others --exclude-standard"];
+	const files = new Set(lists.flatMap((args) => git(args).split("\n")).filter(Boolean));
+	const ignored = (file) => {
+		return file === "qa-kit.json" || [config.specs, config.findings].some((dir) => dir && file.startsWith(`${dir}/`));
+	};
+	return [...files].filter((file) => !ignored(file));
+}
+
+function affectedParts() {
+	if (all) return parts;
+	const inPart = (file, path) => path === "." || file.startsWith(`${path}/`);
+	const touched = new Set();
+	for (const file of changedFiles()) {
+		const owners = parts.filter(([, part]) => inPart(file, part.path));
+		// A file outside every part is shared code, so every part may depend on it.
+		for (const [name] of owners.length ? owners : parts) touched.add(name);
+	}
+	return parts.filter(([name]) => touched.has(name));
+}
+
+const affected = affectedParts();
+
+if (command === "parts") {
+	console.log(JSON.stringify(Object.fromEntries(affected), null, 2));
+} else if (command === "fast") {
+	const failed = [];
+	for (const [name, part] of affected) {
+		for (const cmd of part.fast ?? []) {
+			console.log(`\n▶ ${name}: ${cmd}`);
+			if (spawnSync(cmd, { shell: true, stdio: "inherit" }).status !== 0) failed.push(`${name}: ${cmd}`);
+		}
+	}
+	console.log(affected.length ? `\n${failed.length ? "FAIL" : "PASS"} (${affected.map(([n]) => n).join(", ")})` : "Nothing changed.");
+	for (const f of failed) console.log(`  ✗ ${f}`);
+	process.exit(failed.length ? 1 : 0);
+} else {
+	console.log("usage: qa-kit parts|fast [--all]");
+	process.exit(2);
+}

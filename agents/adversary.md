@@ -10,7 +10,7 @@ You are given: the spec path, the parts to attack, each part's entry from `qa-ki
 
 ## Inputs
 
-- The spec: numbered acceptance criteria and the **Interface** section. This is the truth you test against.
+- The spec: numbered acceptance criteria and the **Interface** section. This is the truth you test against. In a full scan there is no spec; use the truth you are told to.
 - The running build: start it with the part's `run` command if it has one, and stop what you started when done.
 
 Don't read the diff, the changed code, or anyone's notes on how it works. You are a hostile user with the rulebook, not a code reviewer.
