@@ -13,7 +13,7 @@ Read `qa-kit.json` at the repo root (schema in the qa-kit plugin's README). If i
 
 ## 2. What changed
 
-Changed files = committed since `git merge-base origin/<base> HEAD`, plus staged, unstaged and untracked. Leave out files under `specs` and `findings`.
+Changed files = committed since `git merge-base origin/<base> HEAD`, plus staged, unstaged and untracked. Leave out `qa-kit.json` and files under `specs` and `findings`.
 
 Map each file to the part whose `path` contains it. A file in no part is shared code: every part is affected. If arguments name parts, keep only those.
 
@@ -21,7 +21,7 @@ Nothing changed → say so and stop.
 
 ## 3. Fast checks
 
-Run every `fast` command of each affected part. Report failures; they must be fixed before going on.
+Run every `fast` command of each affected part and wait for all of them before step 6, so their results never mix with the tester's new files. Report failures; they must be fixed before going on, unless they come from the machine (a missing tool) rather than the change.
 
 ## 4. Small or big?
 

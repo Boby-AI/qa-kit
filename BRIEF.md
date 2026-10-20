@@ -1,7 +1,6 @@
 # qa-kit — brief
 
-Owner's plan, agreed in conversation on 2026-10-20. Built so far: the plugin (tester, adversary, `/kontrol`),
-not yet tried in a project. Git hook and PR gate come after the trial.
+Owner's plan, agreed in conversation on 2026-10-20. Built so far: the plugin (tester, adversary, `/kontrol`). Git hook and PR gate come after the trial.
 
 ## Goal
 
@@ -58,3 +57,14 @@ The other developers work in React.
 
 Talk in Turkish and keep it very simple: no jargon, no dense tables. Analogies work well
 (cook / taster / saboteur; mirror at home vs security at the door).
+
+## Trial 1 — directorai, 2026-10-20
+
+A real fixed bug (90f13190: account deletion lost credits held by unstarted runs) was put back, with its
+test removed, on a throwaway local worktree. The existing 6 tests still passed. A fresh session ran
+`/kontrol` with an owner-approved spec:
+
+- The tester, from the spec only, wrote 11 tests: 4 fail on the bug, all 11 pass on the real fix.
+- The adversary found the same bug and its worst cases (kept credits 0, or negative).
+- Fixed afterwards in the plugin: fast checks raced the tester; `qa-kit.json` counted as shared code and
+  pulled in every part; the adversary skipped `findings.md`.

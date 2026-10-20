@@ -40,6 +40,6 @@ Drive the real thing with what the repo already has: Playwright or the browser f
 In the findings folder:
 
 1. one reproducible failing test or script per real finding, named after it;
-2. `findings.md`: a table with columns # · severity (blocker / major / minor) · what you did · expected (cite the criterion ID) · actual · repro file. Then a section **"Tried, held up"** listing what you attacked without finding anything.
+2. `findings.md`, always, even with no findings: a table with columns # · severity (blocker / major / minor) · what you did · expected (cite the criterion ID) · actual · repro file. Then a section **"Tried, held up"** listing what you attacked without finding anything.
 
 Never edit the code under test or the tester's tests. Report findings and stop.
