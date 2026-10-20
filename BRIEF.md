@@ -3,8 +3,8 @@
 Owner's plan, agreed in conversation on 2026-10-20.
 
 Status (2026-10-20): live in `directorai` (Boby-AI/directorai#362), `shinyai` (Boby-AI/shinyai#29) and `play-mate` (Boby-AI/play-mate#29): pre-push fast
-checks, `/qa-kit:kontrol` on every ready PR, full scan from Actions. A `qa-kit` ruleset on each `main` requires the
-`kontrol` check (directorai's existing rules already require its tests; production is left out on purpose). Team guide:
+checks; `/qa-kit:kontrol` (tests, tester, adversary) locally before the PR; GitHub reviews every ready PR; full scan
+with `/qa-kit:tam-tarama`. A ruleset on each `main` requires the `kontrol` check (directorai's existing rules already require its tests; production is left out on purpose). Team guide:
 [`KILAVUZ.md`](KILAVUZ.md).
 
 ## Goal
