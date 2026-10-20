@@ -17,7 +17,7 @@ permissions:
 
 # The plugin, the report tool and the pre-push hook run one qa-kit release: bump it here and there together.
 env:
-  QA_KIT_REF: v0.6.1
+  QA_KIT_REF: v0.6.2
 
 # A new push cancels the run for the old one, so an older report never overwrites a newer one.
 concurrency:

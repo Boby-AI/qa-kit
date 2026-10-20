@@ -35,8 +35,10 @@ If it is missing or its front matter lacks `status: approved`:
    - what the change is for, in two or three sentences;
    - numbered acceptance criteria `K1`, `K2`, … — each one observable and testable;
    - an **Interface** section: the functions, endpoints, screens or element ids the tests may use.
-2. Show it to the owner in plain words and wait for approval. Apply their edits.
-3. Save it with front matter `status: approved` and commit it on its own.
+2. Save it, then ask for approval in **three to five short lines**: what the change does and the few things that matter most to test, grouped by topic in plain words, with no criterion IDs and no list of every criterion. Nobody reads a long list, and ten items look like ten problems. Point to the file for the details, wait for approval and apply their edits. For example:
+
+   > Kupon ekleme test edilecek: kim ekleyebilir, boş kod reddediliyor mu, aynı kupon iki kez kullanılabiliyor mu. Ayrıntılar `docs/specs/<branch>.md` içinde. Onaylıyor musun?
+3. Set its front matter to `status: approved` and commit it on its own.
 
 Never change an approved spec without the owner.
 
@@ -57,7 +59,7 @@ Don't pass the diff, file names you changed, or how you built it.
 Tell the owner, simply:
 
 - fast checks: pass/fail;
-- each criterion: pass/fail;
+- criteria: how many passed in one line, and only the failing ones by name;
 - the reviewer's and the adversary's findings by severity, each with its mark (🔴 blocker, 🟠 major, 🟡 minor), and what held up;
 - for each real bug, a **fix prompt** in a code block that someone can paste into a fresh Claude session as is: the criterion ID, what should happen, what happens instead, the command that reproduces it (the failing `qa-spec` test or repro file), and these rules: fix the code, never edit `qa-spec` tests, the repro or the spec, then run `/kontrol` again. Describe the behaviour, not a guessed code location.
 

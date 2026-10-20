@@ -29,13 +29,13 @@ The plugin's hooks keep Claude from opening a PR (`gh pr create`) until `/qa-kit
 
 ## Automatic checks
 
-- **Before push:** add a pre-push hook that runs `npx --yes github:Boby-AI/qa-kit#v0.6.1 fast` (only the changed parts' fast commands). With lefthook:
+- **Before push:** add a pre-push hook that runs `npx --yes github:Boby-AI/qa-kit#v0.6.2 fast` (only the changed parts' fast commands). With lefthook:
 
   ```yaml
   pre-push:
     jobs:
       - name: qa-kit
-        run: npx --yes github:Boby-AI/qa-kit#v0.6.1 fast
+        run: npx --yes github:Boby-AI/qa-kit#v0.6.2 fast
   ```
 
 - **On PR:** copy [`templates/qa-kit.yml`](templates/qa-kit.yml) to `.github/workflows/`, add the `ANTHROPIC_API_KEY` secret, and make the `kontrol` check required on `main`. GitHub runs only the reviewer (no setup, a few minutes); tests and attacks run on the author's computer.
