@@ -18,24 +18,23 @@ To try a local copy instead, use `claude plugin marketplace add /path/to/qa-kit`
 1. finds what changed since the base branch and which parts it touches;
 2. runs those parts' fast checks;
 3. has the reviewer read the diff, like a careful senior reviewer (every change, including config);
-4. stops there for small changes (copy, colours);
-5. for bigger ones, drafts a spec with numbered criteria (`K1`, `K2`, …), which the owner approves;
-6. runs the tester (writes `qa-spec` tests from the spec only) and the adversary (tries to break it) in parallel;
-7. reports, with a paste-ready fix prompt per bug; when everything passes it records that (`qa-kit pass`). The owner tries it and says "oldu".
+4. stops there unless asked for `derin` (deep);
+5. with `derin`: drafts a spec with numbered criteria (`K1`, `K2`, …), which the owner approves, then runs the tester (writes `qa-spec` tests from the spec only) and the adversary (tries to break it) in parallel;
+6. reports, with a paste-ready fix prompt per bug. The owner tries it and says "oldu".
 
-The plugin's hooks keep Claude from opening a PR (`gh pr create`) until `/qa-kit:kontrol` has passed on the code as committed, and mark each pushed commit that passed as `qa-kit/local` on GitHub.
+Nothing is mandatory locally: the agents run on Sonnet, and the slow, costly tester and adversary only on request.
 
 `/qa-kit:tam-tarama [parts]` scans the whole project instead of a change: every part's fast checks, then the adversary on each part.
 
 ## Automatic checks
 
-- **Before push:** add a pre-push hook that runs `npx --yes github:Boby-AI/qa-kit#v0.6.2 fast` (only the changed parts' fast commands). With lefthook:
+- **Before push:** add a pre-push hook that runs `npx --yes github:Boby-AI/qa-kit#v0.7.0 fast` (only the changed parts' fast commands). With lefthook:
 
   ```yaml
   pre-push:
     jobs:
       - name: qa-kit
-        run: npx --yes github:Boby-AI/qa-kit#v0.6.2 fast
+        run: npx --yes github:Boby-AI/qa-kit#v0.7.0 fast
   ```
 
 - **On PR:** copy [`templates/qa-kit.yml`](templates/qa-kit.yml) to `.github/workflows/`, add the `ANTHROPIC_API_KEY` secret, and make the `kontrol` check required on `main`. GitHub runs only the reviewer (no setup, a few minutes); tests and attacks run on the author's computer.

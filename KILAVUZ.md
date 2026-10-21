@@ -4,11 +4,11 @@ PR'larınızı main'e girmeden önce kontrol eden otomatik bir ekip. Kuralı bas
 
 | Kim | Ne yapar | Ne zaman |
 |---|---|---|
-| **Okuyucu** | Kodu okur, gerçek hataları satırın altına not düşer (Greptile gibi). | Her değişiklik; GitHub'da sadece o çalışır |
-| **Tadımcı** | Kodu hiç görmeden, "ne isteniyordu" listesine göre test yazar ve çalıştırır. | Büyük ve riskli işler, PR'dan önce bilgisayarınızda |
-| **Sabotajcı** | İşi bozmaya çalışır: iki kez basma, internet kesilmesi, geri tuşu, küçük ekran… | Büyük ve riskli işler, PR'dan önce bilgisayarınızda |
+| **Okuyucu** | Kodu okur, gerçek hataları satırın altına not düşer (Greptile gibi). | Her PR'da GitHub'da, birkaç dakikada |
+| **Tadımcı** | Kodu hiç görmeden, "ne isteniyordu" listesine göre test yazar ve çalıştırır. | Sadece siz isteyince: `/qa-kit:kontrol derin` |
+| **Sabotajcı** | İşi bozmaya çalışır: iki kez basma, internet kesilmesi, geri tuşu, küçük ekran… | Sadece siz isteyince: `/qa-kit:kontrol derin` |
 
-"Büyük" iş: yeni özellik, mantık değişikliği ya da para, ödeme, hesap gibi hassas dosyalara dokunan her şey. Yazı, renk ve boşluk değişiklikleri küçüktür.
+Tadımcı ve Sabotajcı yavaş ve pahalıdır; ödeme, kredi, hesap gibi riskli bir işte siz isteyince çalışırlar. Günlük işte hiçbir şey beklemeniz gerekmez.
 
 ## Kurulum (bir kere)
 
@@ -22,7 +22,7 @@ Projenin klasöründe `pnpm install` yaptıysanız göndermeden önceki kontrol 
 ## Günlük kullanım
 
 1. **Kod gönderirken (`git push`)** değişen parçaların hızlı testleri kendiliğinden çalışır. Hata varsa gönderim durur, ekranda nedeni yazar.
-2. **PR açmadan önce** kontrol çalışır: Claude'a "PR aç" deyince kendisi başlatır, isterseniz önceden `/qa-kit:kontrol` yazabilirsiniz. Büyük işte size "ne isteniyordu" listesini gösterir, onaylarsınız; Tadımcı ve Sabotajcı bilgisayarınızda çalışır. Geçmeden Claude PR açmaz. Geçince commit'iniz GitHub'da **qa-kit/local** işaretini alır.
+2. **İsterseniz PR'dan önce** `/qa-kit:kontrol` yazın: hızlı testler ve Okuyucu, birkaç dakika. Riskli bir işte `/qa-kit:kontrol derin` yazın: size kısa bir "ne isteniyordu" özeti gösterir, onaylarsınız; Tadımcı ve Sabotajcı da çalışır (daha uzun sürer). Hiçbiri zorunlu değil.
 3. **PR açınca** GitHub'da sadece Okuyucu çalışır, birkaç dakikada biter. Taslak (draft) PR'da çalışmaz; **Ready for review** deyince çalışır.
 
 ## Raporu okumak

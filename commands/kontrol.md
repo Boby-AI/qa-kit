@@ -1,9 +1,11 @@
 ---
-description: Check what changed — fast checks, a code reviewer, then an independent tester and adversary against the approved spec
-argument-hint: "[part names to limit to]"
+description: Check what changed — fast checks and a code reviewer; with "derin", also an independent tester and adversary against an approved spec
+argument-hint: "[derin] [part names to limit to]"
 ---
 
 Check the current change. The doer never grades their own work: you (the implementer) run the steps and fix bugs, but the review, tests and attacks come from fresh agents that never see your reasoning. The reviewer reads the code; the tester and adversary never do.
+
+By default this is light: fast checks and the reviewer. The tester and adversary are slow and costly, so they run only when the arguments include `derin` ("deep"). Suggest `derin` in the report when the change touches a `sensitive` path, but never run it unasked.
 
 Arguments: $ARGUMENTS
 
@@ -13,17 +15,15 @@ Read `qa-kit.json` at the repo root (schema in the qa-kit plugin's README). If i
 
 ## 2. What changed
 
-Run `qa-kit parts` (on PATH from this plugin; also at `${CLAUDE_PLUGIN_ROOT}/bin/qa-kit`). It prints the affected parts' entries, and warns on stderr about tested folders no part covers: pass those warnings on. If arguments name parts, keep only those. No changed files at all → say so and stop. Changed files but no parts (only config, CI or docs) → skip to the reviewer in step 6, then report.
+Run `qa-kit parts` (on PATH from this plugin; also at `${CLAUDE_PLUGIN_ROOT}/bin/qa-kit`). It prints the affected parts' entries, and warns on stderr about tested folders no part covers: pass those warnings on. If arguments name parts (anything other than `derin`), keep only those. No changed files at all → say so and stop. Changed files but no parts (only config, CI or docs) → skip to the reviewer in step 6, then report.
 
 ## 3. Fast checks
 
 Run `qa-kit fast` and wait for it to finish before step 6, so its results never mix with the tester's new files. Report failures; they must be fixed before going on, unless they come from the machine (a missing tool) rather than the change.
 
-## 4. Small or big?
+## 4. Light or deep?
 
-Big if any changed file matches a `sensitive` glob, or the change alters behaviour (logic, data, flows, APIs). Small only if it is just copy, colours, spacing or assets.
-
-Small → run only the reviewer (step 6), then report.
+Without `derin` → run only the reviewer (step 6), then report.
 
 ## 5. Spec
 
@@ -46,7 +46,7 @@ Never change an approved spec without the owner.
 
 Launch the `qa-kit:reviewer` agent on every change, with the base ref (`git merge-base origin/<base> HEAD`) and the spec path if there is one.
 
-For a big change, launch the `qa-kit:tester` and `qa-kit:adversary` agents too, all three **in parallel**: in one message, each with `run_in_background: false`, and wait for every result before the report. Give the tester and adversary only:
+With `derin`, launch the `qa-kit:tester` and `qa-kit:adversary` agents too, all three **in parallel**: in one message, each with `run_in_background: false`, and wait for every result before the report. Give the tester and adversary only:
 
 - the spec path;
 - the affected parts' entries from `qa-kit.json`;
@@ -65,11 +65,11 @@ Tell the owner, simply:
 
 Real bugs → fix the **code**, then run `/kontrol` again. Never edit the tester's `qa-spec` tests or the adversary's repros to make them pass; if you think one is wrong, say why and let the owner decide.
 
-When the fast checks, every criterion and the reviewer pass with no blocker, and no part names limited the run, run `qa-kit pass`. Opening the PR stays blocked until it has run on the code as it is; on push it marks the commit `qa-kit/local` on GitHub. Then the last step is the owner's: they try it and say "oldu".
+When everything passes, the last step is the owner's: they try it and say "oldu".
 
 ## In CI
 
-When the `CI` environment variable is set, GitHub runs only the reviewer, the way a review bot would: no fast checks, no spec, no tester or adversary, which run on the author's computer before the PR. Skip steps 3–5 and launch only the `qa-kit:reviewer` agent with the base ref. No changed files passes. It posts its own blockers and majors as PR comments; don't post them again. Never fix code, and never end your turn before writing `.qa/verdict` (`fail` on any blocker, else `pass`) and `.qa/report.md`, in the language of the PR description, short enough to read in ten seconds:
+When the `CI` environment variable is set, GitHub runs only the reviewer, the way a review bot would: no fast checks, no spec, no tester or adversary, which run only when someone asks for `/qa-kit:kontrol derin` on their computer. Skip steps 3–5 and launch only the `qa-kit:reviewer` agent with the base ref. No changed files passes. It posts its own blockers and majors as PR comments; don't post them again. Never fix code, and never end your turn before writing `.qa/verdict` (`fail` on any blocker, else `pass`) and `.qa/report.md`, in the language of the PR description, short enough to read in ten seconds:
 
 ```
 ✅ Passed — <one plain sentence: what was reviewed>

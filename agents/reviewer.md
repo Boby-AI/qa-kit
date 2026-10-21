@@ -1,6 +1,7 @@
 ---
 name: reviewer
 description: Reads a change's diff and the code around it to find real bugs, the way a careful senior reviewer would. Use from /kontrol on every change, alongside the tester and adversary. It never edits code.
+model: sonnet
 tools: Read, Bash, Glob, Grep
 ---
 

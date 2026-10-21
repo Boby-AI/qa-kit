@@ -3,7 +3,7 @@
 Owner's plan, agreed in conversation on 2026-10-20.
 
 Status (2026-10-20): live in `directorai` (Boby-AI/directorai#362), `shinyai` (Boby-AI/shinyai#29) and `play-mate` (Boby-AI/play-mate#29): pre-push fast
-checks; `/qa-kit:kontrol` (tests, tester, adversary) locally before the PR; GitHub reviews every ready PR; full scan
+checks; `/qa-kit:kontrol` locally on request (`derin` adds tester and adversary); GitHub reviews every ready PR; full scan
 with `/qa-kit:tam-tarama`. A ruleset on each `main` requires the `kontrol` check (directorai's existing rules already require its tests; production is left out on purpose). Team guide:
 [`KILAVUZ.md`](KILAVUZ.md).
 
@@ -37,7 +37,7 @@ Small changes (a colour, a text) skip this. Anything that touches money, rewards
 - `/kontrol` checks **only what changed** (git diff). In a monorepo it picks the changed parts; a change to
   shared code checks every part that uses it.
 - **Before push** (git hook, e.g. Husky for React): fast checks only (format, lint, tests), so nobody is tempted to skip.
-- **Before the PR** (author's computer): the full `/kontrol` with tester and adversary; Claude can't open the PR until it passes.
+- **Before the PR** (author's computer, optional): `/qa-kit:kontrol` for fast checks and the reviewer; `derin` adds tester and adversary.
 - **On PR** (GitHub Actions): only the reviewer, like a review bot. No project setup on GitHub.
 - **Full scan** of a whole project: **started on demand** with `/tam-tarama`, locally. Runs in the background and reports when done.
 
@@ -57,7 +57,10 @@ The other developers work in React.
 
 - Work lands through PRs, not straight pushes to main (approved 2026-10-20).
 - Existing hooks (e.g. lefthook in `directorai`) are reused, not replaced by Husky.
-- A reviewer agent reads every change (Greptile-style inline comments with fix prompts); tester and adversary run on big changes.
+- v0.7 (2026-10-21), after the Shiny developers removed the plugin: the mandatory local `/qa-kit:kontrol` before
+  every PR took too long and used up their Fable quota. Now nothing is mandatory locally, the agents run on
+  Sonnet, and the tester and adversary run only on request (`/qa-kit:kontrol derin`). GitHub's reviewer stays.
+- A reviewer agent reads every change (Greptile-style inline comments with fix prompts); tester and adversary run on request.
 - Tests and attacks run only locally, before the PR; GitHub only reviews the code (2026-10-20). Installing a project's
   toolchain, ffmpeg and the like on GitHub made every PR slow and fragile.
 - Draft PRs wait for "Ready for review". Money is not the constraint; signal over noise is.

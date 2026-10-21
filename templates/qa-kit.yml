@@ -1,7 +1,7 @@
 # Copy to .github/workflows/qa-kit.yml. Needs the ANTHROPIC_API_KEY secret and `.qa/` plus `.qa-kit/`
 # in .gitignore. Make "kontrol" a required check on main.
-# GitHub only reviews the code, so no project setup is needed: the tests and attacks run on the
-# author's computer with /qa-kit:kontrol before the PR (the commit then shows "qa-kit/local").
+# GitHub only reviews the code, so no project setup is needed. Tests and attacks run on request
+# on the author's computer (/qa-kit:kontrol derin).
 name: qa-kit
 
 on:
@@ -17,7 +17,7 @@ permissions:
 
 # The plugin, the report tool and the pre-push hook run one qa-kit release: bump it here and there together.
 env:
-  QA_KIT_REF: v0.6.2
+  QA_KIT_REF: v0.7.0
 
 # A new push cancels the run for the old one, so an older report never overwrites a newer one.
 concurrency:

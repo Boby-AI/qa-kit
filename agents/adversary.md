@@ -1,6 +1,7 @@
 ---
 name: adversary
 description: Tries to break a change against its approved spec. Use from /kontrol after the owner approves the spec. It never fixes the code.
+model: sonnet
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
