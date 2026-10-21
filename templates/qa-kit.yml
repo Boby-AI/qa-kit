@@ -56,7 +56,7 @@ jobs:
           plugin_marketplaces: ${{ github.workspace }}/.qa-kit
           plugins: qa-kit@boby
           prompt: /qa-kit:kontrol
-          claude_args: --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Agent"
+          claude_args: --model sonnet --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Agent"
       - name: Report
         if: ${{ !cancelled() }}
         env:
