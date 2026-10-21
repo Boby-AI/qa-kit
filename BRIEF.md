@@ -59,7 +59,7 @@ The other developers work in React.
 - Existing hooks (e.g. lefthook in `directorai`) are reused, not replaced by Husky.
 - v0.7 (2026-10-21), after the Shiny developers removed the plugin: the mandatory local `/qa-kit:kontrol` before
   every PR took too long and used up their Fable quota. Now nothing is mandatory locally, the agents run on
-  Sonnet, and the tester and adversary run only on request (`/qa-kit:kontrol derin`). GitHub's reviewer stays.
+  Opus, and the tester and adversary run only on request (`/qa-kit:kontrol derin`). GitHub's reviewer stays.
 - A reviewer agent reads every change (Greptile-style inline comments with fix prompts); tester and adversary run on request.
 - Tests and attacks run only locally, before the PR; GitHub only reviews the code (2026-10-20). Installing a project's
   toolchain, ffmpeg and the like on GitHub made every PR slow and fragile.

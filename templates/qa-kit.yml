@@ -17,7 +17,7 @@ permissions:
 
 # The plugin, the report tool and the pre-push hook run one qa-kit release: bump it here and there together.
 env:
-  QA_KIT_REF: v0.7.0
+  QA_KIT_REF: v0.7.1
 
 # A new push cancels the run for the old one, so an older report never overwrites a newer one.
 concurrency:
@@ -56,7 +56,7 @@ jobs:
           plugin_marketplaces: ${{ github.workspace }}/.qa-kit
           plugins: qa-kit@boby
           prompt: /qa-kit:kontrol
-          claude_args: --model sonnet --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Agent"
+          claude_args: --model opus --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Agent"
       - name: Report
         if: ${{ !cancelled() }}
         env:

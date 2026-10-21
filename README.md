@@ -22,19 +22,19 @@ To try a local copy instead, use `claude plugin marketplace add /path/to/qa-kit`
 5. with `derin`: drafts a spec with numbered criteria (`K1`, `K2`, …), which the owner approves, then runs the tester (writes `qa-spec` tests from the spec only) and the adversary (tries to break it) in parallel;
 6. reports, with a paste-ready fix prompt per bug. The owner tries it and says "oldu".
 
-Nothing is mandatory locally: the agents run on Sonnet, and the slow, costly tester and adversary only on request.
+Nothing is mandatory locally: the agents run on Opus, and the slow, costly tester and adversary only on request.
 
 `/qa-kit:tam-tarama [parts]` scans the whole project instead of a change: every part's fast checks, then the adversary on each part.
 
 ## Automatic checks
 
-- **Before push:** add a pre-push hook that runs `npx --yes github:Boby-AI/qa-kit#v0.7.0 fast` (only the changed parts' fast commands). With lefthook:
+- **Before push:** add a pre-push hook that runs `npx --yes github:Boby-AI/qa-kit#v0.7.1 fast` (only the changed parts' fast commands). With lefthook:
 
   ```yaml
   pre-push:
     jobs:
       - name: qa-kit
-        run: npx --yes github:Boby-AI/qa-kit#v0.7.0 fast
+        run: npx --yes github:Boby-AI/qa-kit#v0.7.1 fast
   ```
 
 - **On PR:** copy [`templates/qa-kit.yml`](templates/qa-kit.yml) to `.github/workflows/`, add the `ANTHROPIC_API_KEY` secret, and make the `kontrol` check required on `main`. GitHub runs only the reviewer (no setup, a few minutes); tests and attacks run on the author's computer.

@@ -1,7 +1,7 @@
 ---
 name: tester
 description: Writes and runs the official tests for a change from its approved spec only, without reading the implementation. Use from /kontrol after the owner approves the spec. The implementer must never write or edit these tests.
-model: sonnet
+model: opus
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
