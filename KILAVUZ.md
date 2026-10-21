@@ -54,6 +54,5 @@ Büyük bir sürümden önce ya da arada bir "her şey yolunda mı" diye kullan�
 
 ## Sorun olursa
 
-- **Claude PR açmadan önce kontrol çalıştırıyor:** kontrol bu kodda henüz geçmedi ya da sonra kod değişti. Beklemeniz yeterli.
 - **Göndermeden önceki kontrol bilgisayarınızda eksik bir araç yüzünden duruyor:** hata mesajında yazan aracı kurun. Acil durumda `git push --no-verify` ile geçebilirsiniz; PR'daki kontrol yine çalışır.
 - **Bir projeye eklemek:** projenin köküne `qa-kit.json` ekleyin ([README](README.md#project-config-qa-kitjson)).

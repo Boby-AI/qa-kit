@@ -1,14 +1,17 @@
 #!/usr/bin/env node
-// qa-kit parts [--all]  → prints the parts the change touches, as JSON
-// qa-kit fast  [--all]  → runs those parts' fast commands; exits 1 if any fails
+// qa-kit parts [--all] [--worktree]  → prints the parts the change touches, as JSON
+// qa-kit fast  [--all] [--worktree]  → runs those parts' fast commands; exits 1 if any fails
+// qa-kit slow  [--all] [--worktree]  → runs their slow commands (browser tests and the like)
+// Without --worktree only committed changes count, which is what a push sends.
 // qa-kit report         → CI: posts the /kontrol report to the PR
 // qa-kit comment        → CI: posts one finding to the PR right away (JSON on stdin)
-import { execSync, spawnSync } from "node:child_process";
+import { execSync, spawn, spawnSync } from "node:child_process";
 import { appendFileSync, existsSync, readFileSync } from "node:fs";
-import { join, matchesGlob } from "node:path";
+import { dirname, join, matchesGlob } from "node:path";
 
 const [command, ...flags] = process.argv.slice(2);
 const all = flags.includes("--all");
+const worktree = flags.includes("--worktree");
 const git = (args) => execSync(`git ${args}`, { encoding: "utf8", stdio: ["pipe", "pipe", "ignore"] }).trim();
 const root = git("rev-parse --show-toplevel");
 process.chdir(root);
@@ -17,7 +20,8 @@ const parts = Object.entries(config.parts);
 
 function changedFiles() {
 	const base = git(`merge-base origin/${config.base} HEAD`);
-	const lists = [`diff --name-only ${base}`, "diff --name-only HEAD", "ls-files --others --exclude-standard"];
+	const lists = [`diff --name-only ${base} HEAD`];
+	if (worktree) lists.push("diff --name-only HEAD", "ls-files --others --exclude-standard");
 	const files = new Set(lists.flatMap((args) => git(args).split("\n")).filter(Boolean));
 	const globs = [...(config.ignore ?? []), `${config.specs}/**`, `${config.findings}/**`];
 	const ignored = (file) => {
@@ -26,7 +30,14 @@ function changedFiles() {
 	return [...files].filter((file) => !ignored(file));
 }
 
-const inPart = (file, path) => path === "." || file.startsWith(`${path}/`);
+const pathsOf = (part) => part.paths ?? [part.path];
+const inPart = (file, part) => pathsOf(part).some((path) => path === "." || file === path || file.startsWith(`${path}/`));
+// A lock file belongs wherever its manifest does: pubspec.lock goes with pubspec.yaml.
+const LOCKS = { "pubspec.lock": "pubspec.yaml", "package-lock.json": "package.json", "pnpm-lock.yaml": "package.json", "yarn.lock": "package.json", "deno.lock": "deno.json", "Podfile.lock": "Podfile", "Gemfile.lock": "Gemfile" };
+const owner = (file) => {
+	const lock = LOCKS[file.split("/").pop()];
+	return lock ? join(dirname(file), lock) : file;
+};
 
 // Folders with their own tests that no part covers would go unchecked without anyone noticing.
 function uncoveredTestFolders() {
@@ -39,16 +50,19 @@ function uncoveredTestFolders() {
 	const dirs = tracked.filter((f) => /(^|\/)(package\.json|pubspec\.yaml)$/.test(f) && hasTests(f)).map((f) => f.slice(0, f.lastIndexOf("/") + 1));
 	// The root of a multi-package repo only runs the others' tests.
 	const own = dirs.length > 1 ? dirs.filter((dir) => dir !== "") : dirs;
-	return own.filter((dir) => !parts.some(([, part]) => inPart(dir || "./", part.path)));
+	return own.filter((dir) => !parts.some(([, part]) => inPart(dir ? dir.slice(0, -1) : ".", part)));
 }
 
 function affectedParts() {
 	if (all) return parts;
 	const touched = new Set();
 	for (const file of changedFiles()) {
-		const owners = parts.filter(([, part]) => inPart(file, part.path));
-		// A file outside every part is shared code, so every part may depend on it.
-		for (const [name] of owners.length ? owners : parts) touched.add(name);
+		const owners = parts.filter(([, part]) => inPart(owner(file), part)).map(([name]) => name);
+		// Files outside every part check only the parts "shared" names for them, never everything by default.
+		const shared = Object.entries(config.shared ?? {}).filter(([glob]) => matchesGlob(owner(file), glob));
+		const users = shared.flatMap(([, names]) => (names === "*" ? parts.map(([name]) => name) : names));
+		if (!owners.length && !users.length) console.error(`⚠ qa-kit.json: ${file} belongs to no part; add it to a part's "paths" or to "shared"`);
+		for (const name of [...owners, ...users]) touched.add(name);
 	}
 	return parts.filter(([name]) => touched.has(name));
 }
@@ -93,6 +107,23 @@ function comment() {
 	gh(["pr", "comment", String(number), "--body-file", "-"], path ? `\`${path}:${line}\`\n\n${body}` : body);
 }
 
+// Runs a shell command; with a limit, stops its whole process group once the limit passes.
+function run(cmd, limit) {
+	return new Promise((resolve) => {
+		const child = spawn(cmd, { shell: true, stdio: "inherit", detached: Boolean(limit) });
+		const timer = limit && setTimeout(() => {
+			try {
+				process.kill(-child.pid, "SIGKILL");
+			} catch {}
+			resolve("timeout");
+		}, limit);
+		child.on("exit", (code) => {
+			clearTimeout(timer);
+			resolve(code);
+		});
+	});
+}
+
 if (command === "report") report();
 if (command === "comment") {
 	comment();
@@ -103,18 +134,24 @@ for (const dir of uncoveredTestFolders()) console.error(`⚠ qa-kit.json: ${dir 
 
 if (command === "parts") {
 	console.log(JSON.stringify(Object.fromEntries(affected), null, 2));
-} else if (command === "fast") {
+} else if (command === "fast" || command === "slow") {
+	// A fast command runs before every push, so it gets a time limit; past it, it is stopped and reported, not waited for.
+	const limit = command === "fast" ? (config.fastTimeout ?? 90) * 1000 : 0;
 	const failed = [];
+	const stopped = [];
 	for (const [name, part] of affected) {
-		for (const cmd of part.fast ?? []) {
+		for (const cmd of part[command] ?? []) {
 			console.log(`\n▶ ${name}: ${cmd}`);
-			if (spawnSync(cmd, { shell: true, stdio: "inherit" }).status !== 0) failed.push(`${name}: ${cmd}`);
+			const status = await run(cmd, limit);
+			if (status === "timeout") stopped.push(`${name}: ${cmd}`);
+			else if (status !== 0) failed.push(`${name}: ${cmd}`);
 		}
 	}
 	console.log(affected.length ? `\n${failed.length ? "FAIL" : "PASS"} (${affected.map(([n]) => n).join(", ")})` : "Nothing changed.");
 	for (const f of failed) console.log(`  ✗ ${f}`);
+	for (const f of stopped) console.log(`  ⏱ stopped after ${limit / 1000}s, move it to "slow" in qa-kit.json: ${f}`);
 	process.exit(failed.length ? 1 : 0);
 } else {
-	console.log("usage: qa-kit parts|fast [--all] | report | comment");
+	console.log("usage: qa-kit parts|fast|slow [--all] [--worktree] | report | comment");
 	process.exit(2);
 }

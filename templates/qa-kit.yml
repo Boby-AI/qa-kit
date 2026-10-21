@@ -15,10 +15,6 @@ permissions:
   contents: read
   pull-requests: write
 
-# The plugin, the report tool and the pre-push hook run one qa-kit release: bump it here and there together.
-env:
-  QA_KIT_REF: v0.7.1
-
 # A new push cancels the run for the old one, so an older report never overwrites a newer one.
 concurrency:
   group: qa-kit-${{ github.ref }}
@@ -37,6 +33,8 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      # The plugin, the report tool and the push hook all run the release named by `qaKit` in qa-kit.json.
+      - run: echo "QA_KIT_REF=$(jq -r .qaKit qa-kit.json)" >> "$GITHUB_ENV"
       # The plugin from the pinned release rather than qa-kit's default branch: it runs with this
       # workflow's secrets. The action takes a marketplace URL only without a ref, so the release is
       # checked out and installed from its path.

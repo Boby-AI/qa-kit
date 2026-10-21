@@ -11,15 +11,15 @@ Arguments: $ARGUMENTS
 
 ## 1. Config
 
-Read `qa-kit.json` at the repo root (schema in the qa-kit plugin's README). If it is missing, stop and say the project needs one.
+Read `qa-kit.json` at the repo root (schema in the qa-kit plugin's README). If it is missing, stop and say the project needs one. If its `qaKit` is older than this plugin's version (`${CLAUDE_PLUGIN_ROOT}/package.json`), say so in one line: the push hook and GitHub still run the old release until `qaKit` is raised in a PR.
 
 ## 2. What changed
 
-Run `qa-kit parts` (on PATH from this plugin; also at `${CLAUDE_PLUGIN_ROOT}/bin/qa-kit`). It prints the affected parts' entries, and warns on stderr about tested folders no part covers: pass those warnings on. If arguments name parts (anything other than `derin`), keep only those. No changed files at all → say so and stop. Changed files but no parts (only config, CI or docs) → skip to the reviewer in step 6, then report.
+Run `qa-kit parts --worktree` (on PATH from this plugin; also at `${CLAUDE_PLUGIN_ROOT}/bin/qa-kit`). It prints the affected parts' entries, and warns on stderr about tested folders no part covers: pass those warnings on. If arguments name parts (anything other than `derin`), keep only those. No changed files at all → say so and stop. Changed files but no parts (only config, CI or docs) → skip to the reviewer in step 6, then report.
 
 ## 3. Fast checks
 
-Run `qa-kit fast` and wait for it to finish before step 6, so its results never mix with the tester's new files. Report failures; they must be fixed before going on, unless they come from the machine (a missing tool) rather than the change.
+Run `qa-kit fast --worktree` (with `derin`, then `qa-kit slow --worktree` too) and wait for it to finish before step 6, so its results never mix with the tester's new files. Report failures; they must be fixed before going on, unless they come from the machine (a missing tool) rather than the change.
 
 ## 4. Light or deep?
 
