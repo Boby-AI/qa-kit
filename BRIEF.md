@@ -57,6 +57,11 @@ The other developers work in React.
 
 - Work lands through PRs, not straight pushes to main (approved 2026-10-20).
 - Existing hooks (e.g. lefthook in `directorai`) are reused, not replaced by Husky.
+- v0.8 (2026-10-21), after play-mate pushes took 15+ minutes and developers deleted the hook: parts own several
+  paths and their lock files, `shared` is explicit (no more "outside every part checks everything"), pushes count
+  committed changes only, fast commands have a 90 s limit and long tests live in `slow`, and `qaKit` in
+  qa-kit.json is the one version the hook and workflow run.
+- `shinyai` removed qa-kit on 2026-10-21 (RB Mercan); its `qa-kit` ruleset still required the `kontrol` check.
 - v0.7 (2026-10-21), after the Shiny developers removed the plugin: the mandatory local `/qa-kit:kontrol` before
   every PR took too long and used up their Fable quota. Now nothing is mandatory locally, the agents run on
   Opus, and the tester and adversary run only on request (`/qa-kit:kontrol derin`). GitHub's reviewer stays.
